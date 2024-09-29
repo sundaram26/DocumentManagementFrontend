@@ -1,0 +1,50 @@
+/* .ql-toolbar {
+    @apply rounded-lg bg-white shadow-md;
+  }
+  
+  .ql-container {
+    @apply rounded-lg shadow-md; 
+  }
+  
+  .ql-editor {
+    @apply bg-white rounded-lg;
+  }
+  
+  .ql-picker {
+    @apply rounded-md;
+  }
+  
+  .ql-picker-label {
+    @apply p-2;
+  }
+  
+  .ql-picker-options {
+    @apply bg-white rounded-lg shadow-lg;
+  } */
+  .ql-toolbar {
+    @apply rounded-t-lg bg-transparent shadow-md;
+  }
+  
+  .ql-container {
+    @apply rounded-lg shadow-md border-none; 
+  }
+  .ql-editor {
+    @apply bg-transparent rounded-b-lg;
+  }
+
+
+.ql-toolbar {
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
+    padding: 0.5rem !important; 
+}
+
+.ql-editor {
+    /* padding: 1rem !important; */
+    border-bottom-left-radius: 0.5rem !important;
+    border-bottom-right-radius: 0.5rem !important;
+    border: none !important;
+    background-color: #f9fafb !important; 
+}
+
+
