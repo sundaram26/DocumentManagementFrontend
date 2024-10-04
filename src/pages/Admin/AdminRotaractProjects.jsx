@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteProject, fetchProjectReportsByUser } from '../../store/rotaractMemberSlice';
 import Modal from '../../components/common/Modal';
 import { toast } from 'react-toastify';
-import ProjectView from '../rotaract-member/projectView';
+import ProjectView from '../rotaract-member/ProjectView.jsx';
 
 
 const PAGE_SIZE = 5;
@@ -175,7 +175,7 @@ const AdminRotaractProjects = () => {
                         ))) 
                         : (
                             <div className='text-center text-2xl text-gray-500 font-semibold'>
-                                You haven't submitted any project yet.
+                                No project reports have been submitted by the user yet.
                             </div>
                         )}
                 </div>

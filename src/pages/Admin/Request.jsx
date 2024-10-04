@@ -71,7 +71,7 @@ const Request = () => {
                         ))) 
                         : (
                             <div className='text-center text-2xl text-gray-500 font-semibold'>
-                                You haven't submitted any project yet.
+                                No requests available at the moment.
                             </div>
                         )
                     }

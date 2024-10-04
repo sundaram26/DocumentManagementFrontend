@@ -171,7 +171,7 @@ const AdminDmsActivities = () => {
                         ))) 
                         : (
                             <div className='text-center text-2xl text-gray-500 font-semibold'>
-                                You haven't submitted any activity yet.
+                                No activity reports have been submitted by the user yet.
                             </div>
                         )}
                 </div>
