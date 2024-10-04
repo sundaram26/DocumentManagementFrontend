@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import Modal from '../../components/common/Modal';
 import { fetchProjectReportsByUser } from '../../store/rotaractMemberSlice';
-import ProjectView from './projectView';
+import ProjectView from './ProjectView.jsx';
 
 
 const PAGE_SIZE = 5;
