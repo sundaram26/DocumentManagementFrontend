@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { loginUser } from '../../store/authSlice';
+import { forgotPassword, loginUser } from '../../store/authSlice';
 import { toast } from 'react-toastify';
+import { FaSpinner } from "react-icons/fa";
 
 const AuthLogin = () => {
 
   const dispatch = useDispatch()
   // const { isVerified, isApproved } = useSelector((state) => state.auth)
   const navigate = useNavigate()
-  
+
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -20,6 +22,35 @@ const AuthLogin = () => {
 
   // Regex for email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const handleForgotPassword = async () => {
+    setLoading(true);
+
+    if (!email) {
+      toast.warn("Please provide your email!");
+      return;
+    } else if (!emailRegex.test(email)) {
+      toast.warn("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      const actionResult = await dispatch(forgotPassword(email));
+      const { success, message } = actionResult?.payload || {};
+
+      if (success) {
+        toast.success(message || "Password reset link sent successfully. Check your email.");
+      } else if (actionResult.error) {
+        toast.error(actionResult.error.message || "Failed to send reset link");
+      }
+    } catch (error) {
+      console.error("Error in forgot password:", error);
+      toast.error("An unexpected error occurred while sending the reset link.");
+    } finally{
+      setLoading(false);
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -132,6 +163,19 @@ const AuthLogin = () => {
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
           />
+
+          <div className='flex justify-end items-center'>
+            <p className='text-green-500 font-medium cursor-pointer' onClick={handleForgotPassword}>
+              {loading ? (
+                <span className='flex items-center'>
+                  <FaSpinner className='animate-spin mr-2' /> 
+                  Please wait...
+                </span>
+              ) : (
+                "Forgot Password"
+              )}
+            </p>
+          </div>
           <div className="flex justify-between">
             <button
               type="submit"

@@ -13,6 +13,9 @@ const initialState = {
   projectDraft: null,
   projectDraftByUser: [],
   error: null,
+
+  mouReport: [],
+  mouReportByUser: [],
 };
 
 // Async thunk for creating meeting report
@@ -21,7 +24,7 @@ export const createMeetingReport = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/meeting-reports`,
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/meeting-reports`,
         formData,
         { withCredentials: true }
       );
@@ -36,7 +39,7 @@ export const getRotaractMeetingByUser = createAsyncThunk(
   'projectReports/getRotaractMeetingByUser',
   async ({userId, page = 1, limit = 10, searchQuery }) => {
       const response = await axios.get(
-          `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/meeting-reports`,
+          `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/meeting-reports`,
           { 
             params: { userId, page, limit, searchQuery },
             withCredentials: true 
@@ -52,7 +55,7 @@ export const deleteRotaractMeeting = createAsyncThunk(
   async (meetingId, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/meeting-reports/${meetingId}`,
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/meeting-reports/${meetingId}`,
         { withCredentials: true }
       );
       // console.log("delete response: ",response.data);
@@ -69,7 +72,7 @@ export const createRotaractMeetingDraft = createAsyncThunk(
   async (formData , { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/draft-meeting`,
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/draft-meeting`,
         formData,
         { withCredentials: true }
       );
@@ -85,7 +88,7 @@ export const getRotaractMeetingDrafts = createAsyncThunk(
   async (userId , { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/draft-meeting`,
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/draft-meeting`,
         {
           params:{userId}, 
           withCredentials: true 
@@ -103,7 +106,7 @@ export const deleteRotaractMeetingDraft = createAsyncThunk(
   async (draftId, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/draft-meeting/${draftId}`,
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/draft-meeting/${draftId}`,
         { withCredentials: true }
       );
       return response.data;
@@ -119,7 +122,7 @@ export const projectReport = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/project-reports`,
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/project-reports`,
         formData,
         { withCredentials: true }
       );
@@ -134,7 +137,7 @@ export const fetchProjectReportsByUser = createAsyncThunk(
   'projectReports/fetchProjectReportsByUser',
   async ({userId, page = 1, limit = 10, searchQuery }) => {
       const response = await axios.get(
-          `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/project-reports`,
+          `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/project-reports`,
           { 
             params: { userId, page, limit, searchQuery },
             withCredentials: true 
@@ -151,7 +154,7 @@ export const deleteProject = createAsyncThunk(
     // console.log("from index.js: ", projectId)
     try {
       const response = await axios.delete(
-        `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/project-reports/${projectId}`,
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/project-reports/${projectId}`,
         { withCredentials: true }
       );
       return response.data;
@@ -167,7 +170,7 @@ export const createProjectDraft = createAsyncThunk(
   async (formData , { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/draft-project`,
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/draft-project`,
         formData,
         { withCredentials: true }
       );
@@ -183,7 +186,7 @@ export const getProjectDrafts = createAsyncThunk(
   async (userId , { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/draft-project`,
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/draft-project`,
         {
           params:{userId}, 
           withCredentials: true 
@@ -201,7 +204,7 @@ export const deleteProjectDraft = createAsyncThunk(
   async (draftId, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `https://rotaractanddmsclub.onrender.com/api/v1/members/rotaract/draft-project/${draftId}`,
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/draft-project/${draftId}`,
         { withCredentials: true }
       );
       return response.data;
@@ -211,6 +214,54 @@ export const deleteProjectDraft = createAsyncThunk(
   }
 );
 
+
+//Mou
+export const createMouReport = createAsyncThunk(
+  'mouReports/createMouReport',
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/mou-reports`,
+        formData,
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data || error.message);
+    }
+  }
+);
+
+export const getRotaractMouByUser = createAsyncThunk(
+  'mouReports/getRotaractMouByUser',
+  async ({userId, page = 1, limit = 10, searchQuery }) => {
+      const response = await axios.get(
+          `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/mou-reports`,
+          { 
+            params: { userId, page, limit, searchQuery },
+            withCredentials: true 
+          }
+      );
+      // console.log("getting response from backend: ",response.data);
+      return response.data;
+  }
+);
+
+export const deleteRotaractMou = createAsyncThunk(
+  'mouReports/deleteRotaractMou',
+  async (mouId, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(
+        `https://rotaract-and-dms-club.onrender.com/api/v1/members/rotaract/mou-reports/${mouId}`,
+        { withCredentials: true }
+      );
+      // console.log("delete response: ",response.data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data || error.message);
+    }
+  }
+);
 
 const rotaractSlice = createSlice({
   name: 'rotaract',
@@ -415,6 +466,55 @@ const rotaractSlice = createSlice({
           state.isLoading = false;
           state.projectDraftByUser = [];
           state.error = action.payload || action.error.message;
+      })
+      
+      //mou
+      .addCase(createMouReport.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(createMouReport.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.mouReport = action.payload.data || action.payload;
+        state.error = null;
+      })
+      .addCase(createMouReport.rejected, (state, action) => {
+        state.isLoading = false;
+        state.mouReport = [];
+        state.error = action.payload || action.error.message;
+      })
+
+      //getmouReport
+      .addCase(getRotaractMouByUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getRotaractMouByUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.mouReportByUser = action.payload.data; 
+        state.totalPages = action.payload.totalPages; 
+        state.currentPage = action.payload.currentPage;
+        state.error = null;
+      })
+      .addCase(getRotaractMouByUser.rejected, (state, action) => {
+          state.isLoading = false;
+          state.mouReportByUser = [];
+          state.error = action.payload || action.error.message;
+      })
+
+      //delete mou
+      .addCase(deleteRotaractMou.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteRotaractMou.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.mouReportByUser = []
+        state.error = null;
+      })
+      .addCase(deleteRotaractMou.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || action.error.message;
       })
   },
 });

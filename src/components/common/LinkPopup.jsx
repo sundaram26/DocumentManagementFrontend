@@ -1,6 +1,16 @@
 import React from 'react';
 
 const LinkPopup = ({ links, onClose }) => {
+    
+    const getLinkText = (label) => {
+        switch (label) {
+            case 'Project Finance ExcelSheet':
+                return 'Download Excel Sheet';
+            default:
+                return `View ${label}`;
+        }
+    };
+
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white rounded-lg p-4 shadow-lg">
@@ -10,12 +20,13 @@ const LinkPopup = ({ links, onClose }) => {
                         <li key={index} className="mb-2">
                             <p>
                                 {`${label}: `} 
-                                <a href={url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    className="text-blue-600 underline"
+                                <a 
+                                href={url} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="text-blue-600 underline"
                                 >
-                                    {url}
+                                    {getLinkText(label)}
                                 </a>
                             </p>
                         </li>

@@ -10,6 +10,9 @@ import { getRotaractMeetingByUser, deleteRotaractMeeting } from '../../store/rot
 import Modal from '../../components/common/Modal';
 import RotaractMeetingView from '../rotaract-member/RotaractMeetingView';
 import { toast } from 'react-toastify';
+import RotaractMeetingDownload from '../rotaract-member/RotaractMeetingDownload';
+import { IoMdDownload } from 'react-icons/io';
+import { BlobProvider } from '@react-pdf/renderer';
 
 
 const PAGE_SIZE = 5;
@@ -74,6 +77,41 @@ const RotaractMeetingsReports = () => {
         setShowModal(true);
     };
 
+    const [downloadBlob, setDownloadBlob] = useState(null);
+
+    const handleDownload = async (report) => {
+        return new Promise((resolve, reject) => {
+            const blobProviderInstance = (
+                <BlobProvider document={<RotaractMeetingDownload report={report} />}>
+                    {({ blob, url, loading, error }) => {
+                        if (loading) return;
+                        if (error) {
+                            reject(error);
+                            return;
+                        }
+                        if (blob) {
+                            resolve(blob);
+                        }
+                    }}
+                </BlobProvider>
+            );
+
+            // Render BlobProvider to temporarily generate the blob
+            setDownloadBlob(blobProviderInstance);
+        })
+        .then((blob) => {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Meeting_Report_${report.meetingId}.pdf`;
+            link.click();
+            setDownloadBlob(null); // Cleanup
+        })
+        .catch((error) => {
+            console.error("Failed to generate PDF:", error);
+            setDownloadBlob(null); // Cleanup
+        });
+    };
+
     const handleDelete = async (meetingId) => {
         // console.log("Deleting report with ID:", meetingId);
         try {
@@ -85,6 +123,8 @@ const RotaractMeetingsReports = () => {
             } else {
                 console.error("Filtered reports is not an array:", filteredReports);
             }
+
+            handleReload()
         } catch (error) {
             toast.error("Failed to delete the report");
         }
@@ -179,6 +219,8 @@ const RotaractMeetingsReports = () => {
                             <div className='w-[15%]'>{report.facultyName}</div>
                             <div className='w-[10%] flex gap-2'>
                                 <button onClick={() => handleView(report)} className='text-blue-500'><FaEye /></button>
+                                <div style={{ display: 'none' }}>{downloadBlob}</div>
+                                <button onClick={() => handleDownload(report)} className='text-gray-500'><IoMdDownload /></button>
                                 <button onClick={() => handleDelete(report.meetingId)} className='text-pink-500'><MdDelete /></button>
                             </div>
                         </div>

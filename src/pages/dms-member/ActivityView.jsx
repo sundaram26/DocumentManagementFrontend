@@ -58,8 +58,8 @@ const ActivityView = ({onClose, reports}) => {
             
             {/* Activity Name, Faculty Name, ActivityId, Status */}
             <div className='w-full p-4 pb-1 border-b-2'>
-                <p className='text-xl font-semibold'>{reports.activityName}</p>
-                <p className='text-lg font-semibold text-gray-400'>{`Conducted by ${reports.facultyName}`}</p>
+                <p className='text-xl capitalize font-semibold'>{reports.activityName}</p>
+                <p className='text-lg font-semibold capitalize text-gray-400'>{`Conducted by ${reports.facultyName}`}</p>
                 <div className='flex items-center gap-4'>
                     <div className='px-4 py-[2px] my-2 border-[2px] border-blue-200 bg-blue-200 text-blue-500 flex items-center gap-2 rounded-full'>
                         <FiTag />
@@ -73,6 +73,7 @@ const ActivityView = ({onClose, reports}) => {
                     <div className='px-4 py-[2px] my-2 capitalize border-[2px] border-pink-500 text-pink-500 flex justify-center items-center gap-2 rounded-full'>
                         <LuHeartHandshake />
                         {reports.isJointActivity}
+                        {reports.jointActivityPartner}
                     </div>}
                 </div>
             </div>
@@ -84,8 +85,8 @@ const ActivityView = ({onClose, reports}) => {
                         <GrLocation />
                     </div>
                     <div className='p-2'>
-                        <p className='font-semibold'>{reports.venue}</p>
-                        <p className='text-sm font-semibold text-gray-400'>Venue</p>
+                        <p className='font-semibold capitalize'>{reports.venue}</p>
+                        <p className='text-sm font-semibold capitalize text-gray-400'>Venue</p>
                     </div>
                 </div>
                 <div className='p-2 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] flex items-center rounded-lg'>
@@ -105,7 +106,7 @@ const ActivityView = ({onClose, reports}) => {
                                 }
                             )}
                         </p>
-                        <p className='text-sm font-semibold text-gray-400'>Start Date & Time</p>
+                        <p className='text-sm font-semibold capitalize text-gray-400'>Start Date & Time</p>
                     </div>
                 </div>
                 <div className='p-2 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] flex items-center rounded-lg'>
@@ -125,7 +126,7 @@ const ActivityView = ({onClose, reports}) => {
                                 }
                             )}
                         </p>
-                        <p className='text-sm font-semibold text-gray-400'>Start Date & Time</p>
+                        <p className='text-sm font-semibold capitalize text-gray-400'>Start Date & Time</p>
                     </div>
                 </div>               
                 <div className='p-2 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] flex items-center rounded-lg'>
@@ -133,8 +134,8 @@ const ActivityView = ({onClose, reports}) => {
                         <PiCloudX />
                     </div>
                     <div className='p-2'>
-                        <p className='font-semibold'>{reports.activityMode}</p>
-                        <p className='text-sm font-semibold text-gray-400'>Activity Mode</p>
+                        <p className='font-semibold capitalize'>{reports.activityMode}</p>
+                        <p className='text-sm font-semibold capitalize text-gray-400'>Activity Mode</p>
                     </div>
                 </div>
             </div>

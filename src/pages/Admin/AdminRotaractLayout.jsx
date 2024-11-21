@@ -38,11 +38,17 @@ const AdminRotaractLayout = () => {
   );
 
   const handleProjectView = (userId) => {
+    // console.log("userId of project: ", userId)
     navigate(`/admin/admin-rotaract/${userId}/projects`);
   };
 
   const handleMeetingView = (userId) => {
     navigate(`/admin/admin-rotaract/${userId}/meetings`);
+  };
+
+  const handleMouView = (userId) => {
+    // console.log("userId of Mou: ", userId)
+    navigate(`/admin/admin-rotaract/${userId}/mou`);
   };
 
   return (
@@ -63,7 +69,7 @@ const AdminRotaractLayout = () => {
             <div className='w-[15%] uppercase'>First Name</div>
             <div className='w-[15%] uppercase'>Last Name</div>
             <div className='w-[30%] uppercase'>Email</div>
-            <div className='w-[10%] uppercase'>Role</div>
+            <div className='w-[10%] flex justify-center'>MoU</div>
             <div className='w-[10%] uppercase flex justify-center'>Meeting</div>
             <div className='w-[10%] uppercase flex justify-center'>Project</div>
             <div className='w-[10%] uppercase flex justify-center'>Remove</div>
@@ -75,7 +81,10 @@ const AdminRotaractLayout = () => {
                         <div className='w-[15%]'>{user.firstName}</div>
                         <div className='w-[15%]'>{user.lastName}</div>
                         <div className='w-[30%]'>{user.email}</div>
-                        <div className='w-[10%]'>{user.role}</div>
+                        {/* <div className='w-[10%]'>{user.role}</div> */}
+                        <div className='w-[10%] flex justify-center'>
+                            <button onClick={() => handleMouView(user._id)} className='text-blue-500'><FaEye /></button>
+                        </div>
                         <div className='w-[10%] flex justify-center'>
                             <button onClick={() => handleMeetingView(user._id)} className='text-blue-500'><FaEye /></button>
                         </div>

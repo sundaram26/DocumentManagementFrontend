@@ -23,6 +23,9 @@ const initialState = {
   expense: '',
   profit: '',
   loss: '',
+  activeHomeClubMembers: 0,
+  guestHomeClubMembers: 0,
+  districtCouncilMembers: 0,
   rotarians: '',
   alumnus: '',
   interactors: '',
@@ -39,6 +42,7 @@ const initialState = {
 
 const RotaractMeetingForm = () => {
   const [formData, setFormData] = useState(initialState);
+  const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
   const [isDraft, setIsDraft] = useState(false);
   const dispatch = useDispatch();
@@ -137,6 +141,7 @@ const RotaractMeetingForm = () => {
   const handleSubmit = async (e) => {
     // console.log("Into the submit!!!")
     e.preventDefault();
+    setLoading(true);
     
     if (!content.trim()) {
       toast.error('Required data is not filled!');
@@ -145,8 +150,8 @@ const RotaractMeetingForm = () => {
 
     const wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
 
-    if(wordCount > 200 ) {
-      toast.error('Content exceeds the 200-word limit. Please shorten your text.');
+    if(wordCount > 500 ) {
+      toast.error('Content exceeds the 500-word limit. Please shorten your text.');
       return;
     }
 
@@ -183,6 +188,8 @@ const RotaractMeetingForm = () => {
     } catch (error) {
       // console.log("I am in catch block: ",error)
       toast.error("An error occurred during submission.");
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -206,12 +213,12 @@ const RotaractMeetingForm = () => {
   }, [formData.income, formData.expense]);
 
   useEffect(() => {
-    const totalMembers = Number(formData.rotarians) + Number(formData.alumnus) + Number(formData.interactors) + Number(formData.otherGuests) + Number(formData.otherClubMembers) + Number(formData.otherPis) + Number(formData.otherDistrictRotaractors)
+    const totalMembers = Number(formData.activeHomeClubMembers) + Number(formData.guestHomeClubMembers) + Number(formData.districtCouncilMembers) + Number(formData.rotarians) + Number(formData.alumnus) + Number(formData.interactors) + Number(formData.otherGuests) + Number(formData.otherClubMembers) + Number(formData.otherPis) + Number(formData.otherDistrictRotaractors)
     setFormData((prevState) => ({
-      ...prevState,
-      totalMembers
+    ...prevState,
+    totalMembers
     }))
-  }, [formData.rotarians, formData.alumnus, formData.interactors, formData.otherGuests, formData.otherClubMembers, formData.otherPis, formData.otherDistrictRotaractors])
+  }, [formData.activeHomeClubMembers, formData.guestHomeClubMembers, formData.districtCouncilMembers, formData.rotarians, formData.alumnus, formData.interactors, formData.otherGuests, formData.otherClubMembers, formData.otherPis, formData.otherDistrictRotaractors])
   
   const handleContentChange = (value) => {
     setContent(value);
@@ -236,6 +243,9 @@ const RotaractMeetingForm = () => {
             expense: draftData.expense || 0,
             profit: draftData.profit || 0,
             loss: draftData.loss || 0,
+            activeHomeClubMembers: draftData.activeHomeClubMembers || 0,
+            guestHomeClubMembers: draftData.guestHomeClubMembers || 0,
+            districtCouncilMembers: draftData.districtCouncilMembers || 0,
             rotarians: draftData.rotarians || 0,
             alumnus: draftData.alumnus || 0,
             interactors: draftData.interactors || 0,
@@ -275,19 +285,6 @@ const RotaractMeetingForm = () => {
             />
           </div>
         )})}
-        {/* <div className="relative">
-          <label className="block">Meeting Type<span className="text-red-500">*</span></label>
-          <select name={'meetingType'} required onChange={handleChange} className='w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors'>
-            <option value="select" disabled selected className='text-gray-600'>Meeting Type</option>
-            <option value="GBM">GBM</option>
-            <option value="BOD">BOD</option>
-            <option value="Joint Meeting">Joint Meetings</option>
-            <option value="PIS Expectations">PIS Expectations</option>
-            <option value="OCV">OCV</option>
-            <option value="Letterhead Exchange">Letterhead Exchange</option>
-            <option value="Any other">Anyother</option>
-          </select>
-        </div> */}
       </div>
 
       {/* Start & End Date */}
@@ -323,18 +320,13 @@ const RotaractMeetingForm = () => {
       {/** Minutes of Meeting */}
       <div className="quill-container space-y-4 mb-6 mt-8">
         <p className="text-2xl font-semibold">Minutes of Meetings?<span className="text-red-500">*</span></p>
-        {/* <RichTextEditor name={'meetingSummary'} content={content} setContent={setContent} /> */}
-        {/* <Editor
-          editorState={content}
-          onEditorStateChange={setContent}
-        /> */}
         <ReactQuill 
           value={content} 
           onChange={handleContentChange} 
           modules={modules}
           className="custom-quill border rounded-lg shadow-md"
         />
-        <p className='text-gray-400 text-sm right-0 text-end'>{`${content.trim().split(/\s+/).filter(word => word.length > 0).length}/250 words`}</p>
+        <p className='text-gray-400 text-sm right-0 text-end'>{`${content.trim().split(/\s+/).filter(word => word.length > 0).length}/500 words`}</p>
       </div>
 
       {/* Meeting Finance */}
@@ -382,6 +374,27 @@ const RotaractMeetingForm = () => {
         <p className="font-semibold text-2xl">
           Members Information
         </p>
+        <div className='w-full'>
+            {['Active Home Club Members', 'Guest Home Club Members', 'District Council Members'].map((label, index) => {
+                const name = ['activeHomeClubMembers', 'guestHomeClubMembers', 'districtCouncilMembers']
+                return (
+                    <div key={index} className="relative">
+                        <label className="block text-gray-700 mt-4">{label}<span className="text-red-500">*</span></label>
+                        <input
+                            type="number"
+                            name={name[index]}
+                            value={formData[name[index]] || ''}
+                            onChange={handleChange}
+                            required
+                            placeholder="0"
+                            min="0" 
+                            step="1"
+                            className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+                        />
+                    </div>
+                )
+            })}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {['Rotarians', 'Alumnus', 'Interactors', 'Other Guests', 'Other Club Members', 'Other PIS', 'Other District Rotaractors', 'Total'].map((label, index) =>{
             const name = ['rotarians', 'alumnus', 'interactors', 'otherGuests', 'otherClubMembers', 'otherPis', 'otherDistrictRotaractors', 'totalMembers']
@@ -422,63 +435,60 @@ const RotaractMeetingForm = () => {
 
 
       {/* Support Documents */}
-      <div className="space-y-4 mb-6">
-        <p className="font-semibold text-2xl">Support Documents</p>
+      <div className="w-full flex">
+        <div className="space-y-4 mb-6 w-[50%]">
+          <p className="font-semibold text-2xl">Support Documents</p>
 
-        {/* Cover Image URL Input */}
-        <div className="relative">
-          <label className="block text-gray-700">Cover Image URL<span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            name="coverImageUrl"
-            placeholder="Enter image URL"
-            required
-            value={formData.coverImageUrl}
-            onChange={(e) => handleChange(e, 'coverImageUrl')}
-            className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-          />
-          {/* {coverImageUrl && (
-            <img
-              src={coverImageUrl}
-              alt="Cover Preview"
-              className="mt-4 w-40 h-40 object-contain"
+          {/* Cover Image URL Input */}
+          <div className="relative">
+            <label className="block text-gray-700">Cover Image URL<span className="text-red-500">*</span></label>
+            <input
+                type="text"
+                name="coverImageUrl"
+                placeholder="Enter image URL"
+                required
+                value={formData.coverImageUrl}
+                onChange={(e) => handleChange(e, 'coverImageUrl')}
+                className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
             />
-          )} */}
-        </div>
+          </div>
 
-        {/* Attendance Image URL Input */}
-        <div className="relative">
-          <label className="block text-gray-700">Attendance Image URL<span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            name="attendanceImageUrl"
-            placeholder="Enter image URL"
-            required
-            value={formData.attendanceImageUrl}
-            onChange={(e) => handleChange(e, 'attendanceImageUrl')}
-            className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-          />
-          {/* {attendanceUrl && (
-            <img
-              src={attendanceUrl}
-              alt="Attendance Preview"
-              className="mt-4 w-40 h-40 object-contain"
+          {/* Attendance Image URL Input */}
+          <div className="relative">
+            <label className="block text-gray-700">Attendance Image URL<span className="text-red-500">*</span></label>
+            <input
+                type="text"
+                name="attendanceImageUrl"
+                placeholder="Enter image URL"
+                required
+                value={formData.attendanceImageUrl}
+                onChange={(e) => handleChange(e, 'attendanceImageUrl')}
+                className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
             />
-          )} */}
-        </div>
+          </div>
 
-        {/* Support Document URL Input */}
-        <div className="relative">
-          <label className="block text-gray-700">Support Document URL (Image or Document)<span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            name="supportDocumentUrl"
-            placeholder="Enter document URL"
-            value={formData.supportDocumentUrl}
-            onChange={(e) => handleChange(e, 'supportDocumentUrl')}
-            className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-          />
-          
+          {/* Support Document URL Input */}
+          <div className="relative">
+            <label className="block text-gray-700">Support Document URL (Image or Document)<span className="text-red-500">*</span></label>
+            <input
+                type="text"
+                name="supportDocumentUrl"
+                placeholder="Enter document URL"
+                required
+                onChange={(e) => handleChange(e, 'supportDocumentUrl')}
+                value={formData.supportDocumentUrl}
+                className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+            />          
+          </div>
+        </div>
+        <div className="w-[50%] flex justify-center items-center">
+          {formData.coverImageUrl && (
+              <img
+                  src={formData.coverImageUrl}
+                  alt="Cover Image"
+                  className="max-w-full max-h-80 object-cover rounded-lg"
+              />
+          )}
         </div>
       </div>
 
@@ -494,9 +504,38 @@ const RotaractMeetingForm = () => {
         </Link>
         <button
           type="submit"
-          className="px-4 py-2 bg-white text-green-500 border-2 border-green-500 rounded-lg hover:bg-green-500 hover:text-white"
+          disabled={loading}
+          className={`bg-green-500 text-white py-2 px-4 rounded ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
-          Submit
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <svg
+                className="animate-spin h-5 w-5 mr-3 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C6.48 0 2 4.48 2 10s4.48 10 10 10v-4a8 8 0 01-8-8z"
+                ></path>
+              </svg>
+              Loading...
+            </div>
+          ) : (
+            "Submit"
+          )}
         </button>
       </div>
     </form>

@@ -33,6 +33,10 @@ import RotaractMeetingsReports from './pages/Admin/RotaractMeetingsReports'
 import DmsMeetingsReports from './pages/Admin/DmsMeetingReports'
 import AdminRotaractProjects from './pages/Admin/AdminRotaractProjects'
 import AdminDmsActivities from './pages/Admin/AdminDmsActivities'
+import ResetPassword from './components/Auth/ResetPassword'
+import RotaractMouForm from './pages/rotaract-member/RotaractMouForm'
+import RotaractMou from './pages/rotaract-member/RotaractMou'
+import AdminRotaractMou from './pages/Admin/AdminRotaractMou'
 
 
 const App = () => {
@@ -46,8 +50,11 @@ const App = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(checkAuth())
-  }, [dispatch])
+    if (isAuthenticated && isRegistered && isVerified && isApproved) {
+      dispatch(checkAuth());
+    }
+  }, [isAuthenticated, isRegistered, isVerified, isApproved, dispatch]);
+
 
   if (typeof global === 'undefined') {
     window.global = window;
@@ -70,6 +77,7 @@ const App = () => {
           <Route path='login' element={<AuthLogin />} />
           <Route path='register' element={<AuthRegister />} />
           <Route path='verify-email' element={<VerifyEmail />} />
+          <Route path='reset-password/:token' element={<ResetPassword />} />
         </Route>
 
         <Route 
@@ -90,6 +98,7 @@ const App = () => {
           <Route path='admin-rotaract' element={<AdminRotaractLayout />} />
           <Route path='admin-rotaract/:userId/meetings' element={<RotaractMeetingsReports />} />
           <Route path='admin-rotaract/:userId/projects' element={<AdminRotaractProjects />} />
+          <Route path='admin-rotaract/:userId/mou' element={<AdminRotaractMou />} />
         </Route>
         
         <Route 
@@ -120,9 +129,13 @@ const App = () => {
           <Route path='projects' element={<RotaractProjects />} />
           <Route path='projects/drafts' element={<ProjectDrafts />} />
           <Route path='projects/project-report' element={<RotaractProjectForm />} />
+          
           <Route path='meetings' element={<RotaractMeetings />} />
           <Route path='meetings/drafts' element={<RotaractMeetingDraft />} />
           <Route path='meetings/meeting-report' element={<RotaractMeetingForm />} />
+          
+          <Route path='mou' element={<RotaractMou />} />
+          <Route path='mou/mou-report' element={<RotaractMouForm />} />
         </Route>
       </Routes>
     </div>

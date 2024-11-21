@@ -22,7 +22,6 @@ const Navbar = () => {
     try {
         const actionResult = await dispatch(logoutUser()).unwrap(); // Using unwrap() for handling response
         // console.log(actionResult);
-
         toast.success("You have been successfully logged out.");
         navigate('/auth/login');
     } catch (error) {
@@ -82,7 +81,7 @@ const Navbar = () => {
       case 'DMS':
         return ['Activities', 'Meetings', 'Timer', 'Logout', 'logo2'];
       case 'Rotaract':
-        return ['Projects', 'Meetings', 'Timer', 'Logout', 'logo2'];
+        return ['Projects', 'Meetings', 'MoU', 'Timer', 'Logout', 'logo2'];
       default:
         return ['Timer', 'Logout'];
     }

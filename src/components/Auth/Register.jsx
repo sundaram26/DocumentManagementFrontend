@@ -40,7 +40,7 @@ const AuthRegister = () => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
-      toast.error("Invalid email format!", {
+      toast.info("Invalid email format!", {
         position: toast.position.top_right
       });
       return;

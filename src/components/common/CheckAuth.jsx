@@ -15,7 +15,7 @@ const CheckAuth = ({ isAuthenticated, isVerified, isRegistered, isApproved, chil
 
     // 1. If user is not registered, allow access only to /auth/register and /auth/login
     if (!isRegistered) {
-        if (location.pathname === '/auth/register' || location.pathname === '/auth/login') {
+        if (location.pathname === '/auth/register' || location.pathname === '/auth/login' || location.pathname.startsWith('/auth/reset-password') ) {
             return children;
         } else {
             return <Navigate to="/auth/login" />;
@@ -51,6 +51,7 @@ const CheckAuth = ({ isAuthenticated, isVerified, isRegistered, isApproved, chil
 
     // 5. If user is authenticated, verified, and approved, restrict access to auth routes
     if (isAuthenticated && isVerified && isApproved) {
+
         // Redirect authenticated users to their respective dashboard
         if (location.pathname.startsWith('/auth/')) {
             if (user?.role === 'admin') {

@@ -41,6 +41,8 @@ const RotaractMeetingView = ({onClose, reports}) => {
         setIsPopupOpen(false);
     };
 
+    // console.log("active home club members: ", reports.activeHomeClubMembers)
+
 
   return (
         <div className="w-full bg-white shadow-[0px_4px_12px_rgba(0,0,0,0.2)] rounded-2xl overflow-hidden">
@@ -181,6 +183,38 @@ const RotaractMeetingView = ({onClose, reports}) => {
             {/* Attendance  */}
             <div className='w-full p-4'>
                 <p className='text-2xl font-semibold mb-4'>Attendance</p>
+                <div className="w-full">
+                    <div className='w-full mt-6 p-3 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] rounded-xl'>
+                        <div className='text-3xl text-gray-300 flex justify-end'>
+                            <TbUsersGroup />
+                        </div>
+                        <div>
+                            <p className='text-xl font-semibold'>{reports.activeHomeClubMembers}</p>
+                            <p className='text-gray-400'>Active Home Club Members</p>
+                        </div>
+                        <ProgressBar current={reports.activeHomeClubMembers} total={reports.totalMembers}/>
+                    </div>
+                    <div className='w-full mt-6 p-3 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] rounded-xl'>
+                        <div className='text-3xl text-gray-300 flex justify-end'>
+                            <TbUsersGroup />
+                        </div>
+                        <div>
+                            <p className='text-xl font-semibold'>{reports.guestHomeClubMembers}</p>
+                            <p className='text-gray-400'>Guest Home Club Members</p>
+                        </div>
+                        <ProgressBar current={reports.guestHomeClubMembers} total={reports.totalMembers}/>
+                    </div>
+                    <div className='w-full mt-6 p-3 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] rounded-xl'>
+                        <div className='text-3xl text-gray-300 flex justify-end'>
+                            <TbUsersGroup />
+                        </div>
+                        <div>
+                            <p className='text-xl font-semibold'>{reports.districtCouncilMembers}</p>
+                            <p className='text-gray-400'>District Council Members</p>
+                        </div>
+                        <ProgressBar current={reports.districtCouncilMembers} total={reports.totalMembers}/>
+                    </div>
+                </div>
                 <div className='w-full mt-6 grid grid-cols-4 gap-4'>
                     <div className='w-full p-3 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] rounded-xl'>
                         <div className='text-3xl text-gray-300 flex justify-end'>

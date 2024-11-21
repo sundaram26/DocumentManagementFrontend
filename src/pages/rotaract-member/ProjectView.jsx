@@ -32,6 +32,10 @@ const ProjectView = ({onClose, reports}) => {
         'Support Document': reports.supportDocumentUrl,
     };
 
+    const financeExcelSheet = {
+        'Project Finance ExcelSheet': reports.financeExcelSheet
+    }
+
     const [currentIndex, setCurrentIndex] = useState(0);
     // const [isOpening, setIsOpening] = useState(false);
 
@@ -48,54 +52,20 @@ const ProjectView = ({onClose, reports}) => {
         setCurrentIndex((prev) => (prev - 1 + feedbacks.length) % feedbacks.length);
     };
 
-    // const openAllUrls = () => {
-    //     if (isOpening) return; // Prevent multiple clicks
-    //     setIsOpening(true);
-        
-    //     let openedCount = 0;
-
-    //     supportDocuments.forEach((document, index) => {
-    //         const newWindow = window.open(document, '_blank', 'noopener,noreferrer');
-
-    //         // Check if the new window was blocked
-    //         if (newWindow) {
-    //             openedCount++;
-    //         } else {
-    //             console.warn(`Popup blocked for: ${document}`);
-    //         }
-
-    //         // Delay before checking the next link
-    //         setTimeout(() => {
-    //             if (index === supportDocuments.length - 1) {
-    //                 setIsOpening(false); 
-    //                 if (openedCount === 0) {
-    //                     downloadZip();
-    //                 }
-    //             }
-    //         }, index * 500); 
-    //     });
-    // };
-
-    // const downloadZip = () => {
-    //     const zip = new JSZip();
-
-    //     supportDocuments.forEach((url, index) => {
-    //         zip.file(`document${index + 1}.pdf`, url); // Adjust file name and format as needed
-    //     });
-
-    //     zip.generateAsync({ type: 'blob' }).then((content) => {
-    //         saveAs(content, 'documents.zip');
-    //     });
-    // };
-
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
-
-    const openPopup = () => {
-        setIsPopupOpen(true);
+    const [isPopupOpenSupportDoc, setIsPopupOpenSupportDoc] = useState(false);
+    const openPopupSupportDoc = () => {
+        setIsPopupOpenSupportDoc(true);
     };
-
-    const closePopup = () => {
-        setIsPopupOpen(false);
+    const closePopupSupportDoc = () => {
+        setIsPopupOpenSupportDoc(false);
+    };
+    
+    const [isPopupOpenProjectFinance, setIsPopupOpenProjectFinance] = useState(false);
+    const openPopupProjectFinance = () => {
+        setIsPopupOpenProjectFinance(true);
+    };
+    const closePopupProjectFinance = () => {
+        setIsPopupOpenProjectFinance(false);
     };
 
 
@@ -105,16 +75,22 @@ const ProjectView = ({onClose, reports}) => {
             {/* Project Name, Faculty Name, ProjectId, Status */}
             <div className='w-full p-4 pb-1 border-b-2'>
                 <p className='text-xl font-semibold'>{reports.projectName}</p>
-                <p className='text-lg font-semibold text-gray-400'>{`Conducted by ${reports.facultyName}`}</p>
+                {/* <p className='text-lg font-semibold text-gray-400'>{`Conducted by ${reports.facultyName}`}</p> */}
                 <div className='flex items-center gap-4'>
                     <div className='px-4 py-[2px] my-2 border-[2px] border-blue-200 bg-blue-200 text-blue-500 flex items-center gap-2 rounded-full'>
                         <FiTag />
                         {reports.projectId}
                     </div>
-                    <div className='px-4 py-[2px] my-2 capitalize border-[2px] border-gray-300 text-gray-600 flex justify-center items-center gap-2 rounded-full'>
+                    <div className='px-4 py-[2px] my-2 capitalize border-[2px] border-purple-300 text-purple-600 flex justify-center items-center gap-2 rounded-full'>
                         <FiTag />
                         {reports.status}
                     </div>
+                    {reports.isJointProject && 
+                    <div className='px-4 py-[2px] my-2 capitalize border-[2px] border-pink-500 text-pink-500 flex justify-center items-center gap-2 rounded-full'>
+                        <LuHeartHandshake />
+                        {reports.isJointProject}
+                        {reports.jointProjectPartner}
+                    </div>}
                     {reports.isAnInstallation && 
                     <div className='px-4 py-[2px] my-2 capitalize border-[2px] border-gray-300 text-gray-600 flex justify-center items-center gap-2 rounded-full'>
                         <CiSettings />
@@ -125,17 +101,12 @@ const ProjectView = ({onClose, reports}) => {
                         <AiOutlineCrown />
                         {reports.isFlagship}
                     </div>}
-                    {reports.isJointProject && 
-                    <div className='px-4 py-[2px] my-2 capitalize border-[2px] border-pink-500 text-pink-500 flex justify-center items-center gap-2 rounded-full'>
-                        <LuHeartHandshake />
-                        {reports.isJointProject}
-                    </div>}
                 </div>
             </div>
 
             {/* Venue, Start Date & Time, End Date & Time, Primary Avenue, Secondary Avenue, Project mode */}
             <div className='w-full p-4 grid grid-cols-3 gap-4'>
-                <div className='p-2 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] flex items-center rounded-lg'>
+                <div className='p-2 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] capitalize flex items-center rounded-lg'>
                     <div className='p-2 bg-red-200 text-red-600 text-4xl rounded-md'>
                         <GrLocation />
                     </div>
@@ -202,7 +173,7 @@ const ProjectView = ({onClose, reports}) => {
                         <p className='text-sm font-semibold text-gray-400'>Secondary Avenue</p>
                     </div>
                 </div>
-                <div className='p-2 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] flex items-center rounded-lg'>
+                <div className='p-2 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] capitalize flex items-center rounded-lg'>
                     <div className='p-2 bg-orange-200 text-orange-600 text-4xl rounded-md'>
                         <PiCloudX />
                     </div>
@@ -226,6 +197,12 @@ const ProjectView = ({onClose, reports}) => {
                     <p className='text-xl mb-1 text-gray-600 font-semibold'>Project Groundwork:</p>
                     <div className='w-full h-[25vh] p-4 border-[1px] border-gray-200 rounded-lg overflow-y-auto'>
                         <div dangerouslySetInnerHTML={{ __html: reports.projectGroundwork }} />
+                    </div>
+                </div>
+                <div className='pt-4 pb-8 border-b-2 border-gray-200'>
+                    <p className='text-xl mb-1 text-gray-600 font-semibold'>Project Summary:</p>
+                    <div className='w-full h-[25vh] p-4 border-[1px] border-gray-200 rounded-lg overflow-y-auto'>
+                        <div dangerouslySetInnerHTML={{ __html: reports.projectSummary }} />
                     </div>
                 </div>
             </div>
@@ -291,16 +268,16 @@ const ProjectView = ({onClose, reports}) => {
             {/* Support Document Url  */}
             <div className='w-full px-4 flex items-center gap-2'>
                 <p className='text-xl'>To View the</p>
-                <button onClick={openPopup} className="cursor-pointer text-purple-600 text-xl font-semibold flex items-center gap-2">
+                <button onClick={openPopupSupportDoc} className="cursor-pointer text-purple-600 text-xl font-semibold flex items-center gap-2">
                     Supporting Documents <FiExternalLink />
                 </button>
                 {/* Render Popup */}
-                {isPopupOpen && <LinkPopup links={supportDocuments} onClose={closePopup} />}
+                {isPopupOpenSupportDoc && <LinkPopup links={supportDocuments} onClose={closePopupSupportDoc} />}
             </div>
 
             {/* Project Finance  */}
             <div className='w-full p-4 mt-4'>
-                <p className='text-xl mb-2'>Project Finances</p>
+                <p className='text-2xl mb-2 font-semibold'>Project Finances</p>
                 <div className='w-full grid grid-cols-4 gap-4'>
                     <div className='p-2 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] flex items-center rounded-lg bg-blue-300'>
                         <div className='p-2 bg-white text-blue-300 text-4xl rounded-md'>
@@ -339,6 +316,14 @@ const ProjectView = ({onClose, reports}) => {
                         </div>
                     </div>
                 </div>
+                <div className='w-full mt-4 flex items-center gap-2'>
+                    <p className='text-xl'>To View the</p>
+                    <button onClick={openPopupProjectFinance} className="cursor-pointer text-purple-600 text-xl font-semibold flex items-center gap-2">
+                        Project Finance <FiExternalLink />
+                    </button>
+                    {/* Render Popup */}
+                    {isPopupOpenProjectFinance && <LinkPopup links={financeExcelSheet} onClose={closePopupProjectFinance} />}
+                </div>
             </div>
 
             {/* Attendance  */}
@@ -357,7 +342,39 @@ const ProjectView = ({onClose, reports}) => {
                             ))}
                         </div>
                         <p className='mt-2 text-gray-400'>Project Chair Persons</p>
-                        <ProgressBar current={reports.chairPersons.length} total={22}/>
+                        <ProgressBar current={reports.chairPersons.length} total={24}/>
+                    </div>
+                </div>
+                <div className="w-full">
+                    <div className='w-full mt-6 p-3 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] rounded-xl'>
+                        <div className='text-3xl text-gray-300 flex justify-end'>
+                            <TbUsersGroup />
+                        </div>
+                        <div>
+                            <p className='text-xl font-semibold'>{reports.activeHomeClubMembers}</p>
+                            <p className='text-gray-400'>Active Home Club Members</p>
+                        </div>
+                        <ProgressBar current={reports.activeHomeClubMembers} total={reports.totalMembers}/>
+                    </div>
+                    <div className='w-full mt-6 p-3 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] rounded-xl'>
+                        <div className='text-3xl text-gray-300 flex justify-end'>
+                            <TbUsersGroup />
+                        </div>
+                        <div>
+                            <p className='text-xl font-semibold'>{reports.guestHomeClubMembers}</p>
+                            <p className='text-gray-400'>Guest Home Club Members</p>
+                        </div>
+                        <ProgressBar current={reports.guestHomeClubMembers} total={reports.totalMembers}/>
+                    </div>
+                    <div className='w-full mt-6 p-3 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] rounded-xl'>
+                        <div className='text-3xl text-gray-300 flex justify-end'>
+                            <TbUsersGroup />
+                        </div>
+                        <div>
+                            <p className='text-xl font-semibold'>{reports.districtCouncilMembers}</p>
+                            <p className='text-gray-400'>District Council Members</p>
+                        </div>
+                        <ProgressBar current={reports.districtCouncilMembers} total={reports.totalMembers}/>
                     </div>
                 </div>
                 <div className='w-full mt-6 grid grid-cols-4 gap-4'>

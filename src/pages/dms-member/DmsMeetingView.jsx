@@ -132,7 +132,7 @@ const DmsMeetingView = ({onClose, reports}) => {
 
             {/* Project Finance  */}
             <div className='w-full p-4 mt-4'>
-                <p className='text-xl mb-2'>Project Finances</p>
+                <p className='text-xl mb-2'>Meeting Finances</p>
                 <div className='w-full grid grid-cols-4 gap-4'>
                     <div className='p-2 shadow-[0px_4px_12px_rgba(0,0,0,0.2)] flex items-center rounded-lg bg-purple-300'>
                         <div className='p-2 bg-white text-purple-300 text-4xl rounded-md'>

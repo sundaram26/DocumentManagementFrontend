@@ -25,6 +25,7 @@ const initialState = {
     endDate: '',
     // isDraft: false,
     isJointActivity: false,
+    jointActivityPartner: '',
     expense: 0,
     chairPersons: '',
     coverImageUrl: '',
@@ -61,6 +62,7 @@ const chairPersonOptions = [
 
 const DmsActivityForm = () => {
   const [formData, setFormData] = useState(initialState);
+  const [loading, setLoading] = useState(false);
   const [activityAim, setActivityAim] = useState("");
   const [activityGroundwork, setActivityGroundwork] = useState("");
   const [feedbackList, setFeedbackList] = useState([{ feedbackGivenBy: '', feedbackMessage: '' }]);
@@ -186,6 +188,7 @@ const DmsActivityForm = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     
     if(isDraft){
       toast.message('You cannot submit the form while it is marked as a draft.')
@@ -203,19 +206,25 @@ const DmsActivityForm = () => {
     const activityAimWordCount = getWordCount(activityAim);
     const activityGroundworkWordCount = getWordCount(activityGroundwork);
 
-    if (activityAimWordCount > 250) {
-        toast.error('Activity Aim exceeds the 250-word limit. Please shorten your text.');
+    if (activityAimWordCount > 500) {
+        toast.error('Activity Aim exceeds the 500-word limit. Please shorten your text.');
         return;
     }
 
-    if (activityGroundworkWordCount > 250) {
-        toast.error('Activity Groundwork exceeds the 250-word limit. Please shorten your text.');
+    if (activityGroundworkWordCount > 500) {
+        toast.error('Activity Groundwork exceeds the 500-word limit. Please shorten your text.');
         return;
     }
 
     if ( formData.chairPersons === '') {
         toast.error('Please select valid options from dropdown!!!');
         return;
+    }
+
+    if(formData.isJointActivity){
+        if(formData.jointActivityPartner === ""){
+            toast.error("Activity Partner is required!!!")
+        }
     }
   
     // console.log("activity aim: ", activityAim)
@@ -250,12 +259,17 @@ const DmsActivityForm = () => {
   
       if (response?.success) {
         navigate('/member/dms-member/activities');
+        if(draftData?.draftId){
+            handleDraftDelete(draftData.draftId)
+        }
         toast.success("The form has been successfully submitted");
       } else {
         toast.error(response?.message || "Submission failed!");
       }
     } catch (error) {
       toast.error("An error occurred during submission.");
+    } finally {
+        setLoading(false);
     }
   };
   
@@ -297,6 +311,7 @@ const DmsActivityForm = () => {
             startDate: formatDateForInput(draftData.startDate), // Format for input
             endDate: formatDateForInput(draftData.endDate),
             isJointActivity: draftData.isJointActivity,
+            jointActivityPartner: draftData.jointActivityPartner,
             expense: draftData.expense || 0,
             chairPersons: draftData.chairPersons || [],
             coverImageUrl: draftData.coverImageUrl || '',
@@ -341,6 +356,7 @@ const DmsActivityForm = () => {
                 <option value="select" disabled>Activity Mode</option>
                 <option value="online">ONLINE</option>
                 <option value="on-ground">ON-GROUND</option>
+                <option value="both">BOTH</option>
             </select>
             </div>
         </div>
@@ -391,6 +407,23 @@ const DmsActivityForm = () => {
                 )
             })}
         </div>
+        {formData.isJointActivity && (
+            <div className="mt-4">
+                <label>Activity Partner:<span className="text-red-500">*</span></label>
+                <input 
+                    type="text" 
+                    name="jointActivityPartner" 
+                    value={formData.jointActivityPartner || ''} 
+                    onChange={(e) => 
+                        setFormData((prev) => ({
+                            ...prev,
+                            jointActivityPartner: e.target.value,
+                        }))
+                    } 
+                    className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+                />
+            </div>
+        )}
       
         {/** Activity Aim */}
         <div className="quill-container space-y-4 mb-6 mt-8">
@@ -407,7 +440,7 @@ const DmsActivityForm = () => {
             required
             className="custom-quill border rounded-lg shadow-md"
             />
-            <p className='text-gray-400 text-sm right-0 text-end'>{`${activityAim.trim().split(/\s+/).filter(word => word.length > 0).length}/250 words`}</p>
+            <p className='text-gray-400 text-sm right-0 text-end'>{`${activityAim.trim().split(/\s+/).filter(word => word.length > 0).length}/500 words`}</p>
         </div>
 
         {/** Activity Groundwork */}
@@ -425,7 +458,7 @@ const DmsActivityForm = () => {
             required
             className="custom-quill border rounded-lg shadow-md"
             />
-            <p className='text-gray-400 text-sm right-0 text-end'>{`${activityAim.trim().split(/\s+/).filter(word => word.length > 0).length}/250 words`}</p>
+            <p className='text-gray-400 text-sm right-0 text-end'>{`${activityAim.trim().split(/\s+/).filter(word => word.length > 0).length}/500 words`}</p>
         </div>
 
         {/** Activity Feedback */}
@@ -514,49 +547,60 @@ const DmsActivityForm = () => {
 
 
         {/* Support Documents */}
-        <div className="space-y-4 mb-6">
-            <p className="font-semibold text-2xl">Support Documents</p>
+        <div className="w-full flex">
+            <div className="space-y-4 mb-6 w-[50%]">
+                <p className="font-semibold text-2xl">Support Documents</p>
 
-            {/* Cover Image URL Input */}
-            <div className="relative">
-            <label className="block text-gray-700">Cover Image URL<span className="text-red-500">*</span></label>
-            <input
-                type="text"
-                name="coverImageUrl"
-                placeholder="Enter image URL"
-                required
-                value={formData.coverImageUrl}
-                onChange={(e) => handleChange(e, 'coverImageUrl')}
-                className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-            />
+                {/* Cover Image URL Input */}
+                <div className="relative">
+                    <label className="block text-gray-700">Cover Image URL<span className="text-red-500">*</span></label>
+                    <input
+                        type="text"
+                        name="coverImageUrl"
+                        placeholder="Enter image URL"
+                        required
+                        value={formData.coverImageUrl}
+                        onChange={(e) => handleChange(e, 'coverImageUrl')}
+                        className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+                    />
+                </div>
+
+                {/* Attendance Image URL Input */}
+                <div className="relative">
+                    <label className="block text-gray-700">Attendance Image URL<span className="text-red-500">*</span></label>
+                    <input
+                        type="text"
+                        name="attendanceImageUrl"
+                        placeholder="Enter image URL"
+                        required
+                        value={formData.attendanceImageUrl}
+                        onChange={(e) => handleChange(e, 'attendanceImageUrl')}
+                        className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+                    />
+                </div>
+
+                {/* Support Document URL Input */}
+                <div className="relative">
+                    <label className="block text-gray-700">Support Document URL (Image or Document)<span className="text-red-500">*</span></label>
+                    <input
+                        type="text"
+                        name="supportDocumentUrl"
+                        placeholder="Enter document URL"
+                        required
+                        onChange={(e) => handleChange(e, 'supportDocumentUrl')}
+                        value={formData.supportDocumentUrl}
+                        className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+                    />          
+                </div>
             </div>
-
-            {/* Attendance Image URL Input */}
-            <div className="relative">
-            <label className="block text-gray-700">Attendance Image URL<span className="text-red-500">*</span></label>
-            <input
-                type="text"
-                name="attendanceImageUrl"
-                placeholder="Enter image URL"
-                required
-                value={formData.attendanceImageUrl}
-                onChange={(e) => handleChange(e, 'attendanceImageUrl')}
-                className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-            />
-            </div>
-
-            {/* Support Document URL Input */}
-            <div className="relative">
-            <label className="block text-gray-700">Support Document URL (Image or Document)<span className="text-red-500">*</span></label>
-            <input
-                type="text"
-                name="supportDocumentUrl"
-                placeholder="Enter document URL"
-                value={formData.supportDocumentUrl}
-                onChange={(e) => handleChange(e, 'supportDocumentUrl')}
-                className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-            />
-            
+            <div className="w-[50%] flex justify-center items-center">
+            {formData.coverImageUrl && (
+                <img
+                    src={formData.coverImageUrl}
+                    alt="Cover Image"
+                    className="max-w-full max-h-80 object-cover rounded-lg"
+                />
+            )}
             </div>
         </div>
 
@@ -572,9 +616,38 @@ const DmsActivityForm = () => {
             </Link>
             <button
             type="submit"
-            className="px-4 py-2 bg-white text-green-500 border-2 border-green-500 rounded-lg hover:bg-green-500 hover:text-white"
+            disabled={loading}
+            className={`bg-green-500 text-white py-2 px-4 rounded ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             >
-            Submit
+            {loading ? (
+                <div className="flex items-center justify-center">
+                    <svg
+                        className="animate-spin h-5 w-5 mr-3 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        ></circle>
+                        <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C6.48 0 2 4.48 2 10s4.48 10 10 10v-4a8 8 0 01-8-8z"
+                        ></path>
+                    </svg>
+                    Loading...
+                    </div>
+                ) : (
+                    "Submit"
+                )}
             </button>
         </div>
     </form>

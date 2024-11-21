@@ -30,6 +30,7 @@ const initialState = {
 
 const DmsMeetingForm = () => {
   const [formData, setFormData] = useState(initialState);
+  const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
   const [isDraft, setIsDraft] = useState(false);
   const dispatch = useDispatch();
@@ -127,6 +128,7 @@ const DmsMeetingForm = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     
     if (!content.trim()) {
       toast.error('Required data is not filled!');
@@ -135,8 +137,8 @@ const DmsMeetingForm = () => {
 
     const wordCount = content.trim().split(/\s+/).filter(word => word.length > 0).length;
 
-    if(wordCount > 200 ) {
-      toast.error('Content exceeds the 200-word limit. Please shorten your text.');
+    if(wordCount > 500 ) {
+      toast.error('Content exceeds the 500-word limit. Please shorten your text.');
       return;
     }
 
@@ -168,6 +170,8 @@ const DmsMeetingForm = () => {
       }
     } catch (error) {
       toast.error("An error occurred during submission.");
+    } finally {
+      setLoading(false); // Stop loading after submission
     }
   };
   
@@ -291,7 +295,7 @@ const DmsMeetingForm = () => {
           modules={modules}
           className="custom-quill border rounded-lg shadow-md"
         />
-        <p className='text-gray-400 text-sm right-0 text-end'>{`${content.trim().split(/\s+/).filter(word => word.length > 0).length}/200 words`}</p>
+        <p className='text-gray-400 text-sm right-0 text-end'>{`${content.trim().split(/\s+/).filter(word => word.length > 0).length}/500 words`}</p>
       </div>
 
       {/* Meeting Finance */}
@@ -320,49 +324,60 @@ const DmsMeetingForm = () => {
 
 
       {/* Support Documents */}
-      <div className="space-y-4 mb-6">
-        <p className="font-semibold text-2xl">Support Documents</p>
+      <div className="w-full flex">
+        <div className="space-y-4 mb-6 w-[50%]">
+          <p className="font-semibold text-2xl">Support Documents</p>
 
-        {/* Cover Image URL Input */}
-        <div className="relative">
-          <label className="block text-gray-700">Cover Image URL<span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            name="coverImageUrl"
-            placeholder="Enter image URL"
-            required
-            value={formData.coverImageUrl}
-            onChange={(e) => handleChange(e, 'coverImageUrl')}
-            className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-          />
+          {/* Cover Image URL Input */}
+          <div className="relative">
+            <label className="block text-gray-700">Cover Image URL<span className="text-red-500">*</span></label>
+            <input
+                type="text"
+                name="coverImageUrl"
+                placeholder="Enter image URL"
+                required
+                value={formData.coverImageUrl}
+                onChange={(e) => handleChange(e, 'coverImageUrl')}
+                className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+            />
+          </div>
+
+          {/* Attendance Image URL Input */}
+          <div className="relative">
+            <label className="block text-gray-700">Attendance Image URL<span className="text-red-500">*</span></label>
+            <input
+                type="text"
+                name="attendanceImageUrl"
+                placeholder="Enter image URL"
+                required
+                value={formData.attendanceImageUrl}
+                onChange={(e) => handleChange(e, 'attendanceImageUrl')}
+                className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+            />
+          </div>
+
+          {/* Support Document URL Input */}
+          <div className="relative">
+            <label className="block text-gray-700">Support Document URL (Image or Document)<span className="text-red-500">*</span></label>
+            <input
+                type="text"
+                name="supportDocumentUrl"
+                placeholder="Enter document URL"
+                required
+                onChange={(e) => handleChange(e, 'supportDocumentUrl')}
+                value={formData.supportDocumentUrl}
+                className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+            />          
+          </div>
         </div>
-
-        {/* Attendance Image URL Input */}
-        <div className="relative">
-          <label className="block text-gray-700">Attendance Image URL<span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            name="attendanceImageUrl"
-            placeholder="Enter image URL"
-            required
-            value={formData.attendanceImageUrl}
-            onChange={(e) => handleChange(e, 'attendanceImageUrl')}
-            className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-          />
-        </div>
-
-        {/* Support Document URL Input */}
-        <div className="relative">
-          <label className="block text-gray-700">Support Document URL (Image or Document)<span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            name="supportDocumentUrl"
-            placeholder="Enter document URL"
-            value={formData.supportDocumentUrl}
-            onChange={(e) => handleChange(e, 'supportDocumentUrl')}
-            className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-          />
-          
+        <div className="w-[50%] flex justify-center items-center">
+          {formData.coverImageUrl && (
+              <img
+                  src={formData.coverImageUrl}
+                  alt="Cover Image"
+                  className="max-w-full max-h-80 object-cover rounded-lg"
+              />
+          )}
         </div>
       </div>
 
@@ -378,9 +393,38 @@ const DmsMeetingForm = () => {
         </Link>
         <button
           type="submit"
-          className="px-4 py-2 bg-white text-green-500 border-2 border-green-500 rounded-lg hover:bg-green-500 hover:text-white"
+          disabled={loading}
+          className={`bg-green-500 text-white py-2 px-4 rounded ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
-          Submit
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <svg
+                className="animate-spin h-5 w-5 mr-3 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C6.48 0 2 4.48 2 10s4.48 10 10 10v-4a8 8 0 01-8-8z"
+                ></path>
+              </svg>
+              Loading...
+            </div>
+          ) : (
+            "Submit"
+          )}
         </button>
       </div>
     </form>

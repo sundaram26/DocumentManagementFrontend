@@ -27,13 +27,15 @@ const initialState = {
     resendEmailTimer: 0,
     canResendEmail: true,
     error: null,
+    resetLinkSent: false,
+    resetLinkMessage: "",
 };
 
 export const registerUser = createAsyncThunk(
     '/auth/register',
     async (formData) => {
         const response = await axios.post(
-            `https://rotaractanddmsclub.onrender.com/api/v1/users/register`, 
+            `https://rotaract-and-dms-club.onrender.com/api/v1/users/register`, 
             formData, 
             { withCredentials: true }
         );
@@ -45,7 +47,7 @@ export const verifyEmail = createAsyncThunk(
     'auth/verify-email',
     async (verificationCode) => {
         const response = await axios.post(
-            `https://rotaractanddmsclub.onrender.com/api/v1/users/verify-otp`,
+            `https://rotaract-and-dms-club.onrender.com/api/v1/users/verify-otp`,
             { verificationCode },
             { withCredentials: true }
         );
@@ -57,7 +59,7 @@ export const resendVerificationEmail = createAsyncThunk(
     'auth/resend-verification-email',
     async () => {
         const response = await axios.post(
-            `https://rotaractanddmsclub.onrender.com/api/v1/users/resend-otp`,
+            `https://rotaract-and-dms-club.onrender.com/api/v1/users/resend-otp`,
             {},
             { withCredentials: true }
         );
@@ -70,7 +72,7 @@ export const loginUser = createAsyncThunk(
     async (formData) => {
         // console.log("form data: ", formData)
         const response = await axios.post(
-            `https://rotaractanddmsclub.onrender.com/api/v1/users/login`,
+            `https://rotaract-and-dms-club.onrender.com/api/v1/users/login`,
             formData,
             { withCredentials: true }
         );
@@ -79,11 +81,43 @@ export const loginUser = createAsyncThunk(
     }
 );
 
+export const forgotPassword = createAsyncThunk(
+    'auth/forgotPassword',
+    async (email, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(
+                `https://rotaract-and-dms-club.onrender.com/api/v1/users/forgot-password`,
+                { email },
+                {withCredentials:true}
+            );
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Failed to send reset link");
+        }
+    }
+);
+
+export const resetPassword = createAsyncThunk(
+    'auth/resetPassword',
+    async ({ token, password }, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(
+                `https://rotaract-and-dms-club.onrender.com/api/v1/users/reset-password/${token}`, // Use the token in the URL
+                { password },
+                { withCredentials: true }
+            );
+            return response.data; 
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Failed to reset password");
+        }
+    }
+);
+
 export const checkAuth = createAsyncThunk(
     "/auth/checkAuth",
     async () => {
         const response = await axios.get(
-            `https://rotaractanddmsclub.onrender.com/api/v1/users/check-auth`,
+            `https://rotaract-and-dms-club.onrender.com/api/v1/users/check-auth`,
             {
                 withCredentials: true,
                 headers: {
@@ -100,7 +134,7 @@ export const logoutUser = createAsyncThunk(
     "/auth/logout",
     async () => {
         const response = await axios.post(
-            `https://rotaractanddmsclub.onrender.com/api/v1/users/logout`,
+            `https://rotaract-and-dms-club.onrender.com/api/v1/users/logout`,
             {},
             { withCredentials: true }
         )
@@ -210,6 +244,38 @@ export const authSlice = createSlice({
             state.isAuthenticated = false;
             state.error = action.error.message;
         })
+
+        // Forgot password cases
+        .addCase(forgotPassword.pending, (state) => {
+            state.isLoading = true;
+            state.error = null;
+        })
+        .addCase(forgotPassword.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.resetLinkSent = true;
+            state.resetLinkMessage = action.payload.message;
+        })
+        .addCase(forgotPassword.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = action.payload;
+            state.resetLinkSent = false;
+        })
+
+        .addCase(resetPassword.pending, (state) => {
+            state.isLoading = true;
+            state.error = null;
+        })
+        .addCase(resetPassword.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.resetLinkSent = true;
+            state.resetLinkMessage = action.payload.message; 
+        })
+        .addCase(resetPassword.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = action.payload; 
+            state.resetLinkSent = false;
+        })
+
         .addCase(checkAuth.pending, (state) => {
             state.isLoading = true;
             state.error = null;

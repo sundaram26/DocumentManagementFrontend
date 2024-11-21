@@ -10,6 +10,9 @@ import { deleteActivity, fetchActivityReportsByUser } from '../../store/dmsMembe
 import Modal from '../../components/common/Modal';
 import { toast } from 'react-toastify';
 import ActivityView from '../dms-member/ActivityView';
+import ActivityDownload from '../dms-member/ActivityDownload';
+import { BlobProvider } from '@react-pdf/renderer';
+import { IoMdDownload } from 'react-icons/io';
 
 
 const PAGE_SIZE = 5;
@@ -74,6 +77,41 @@ const AdminDmsActivities = () => {
         setShowModal(true);
     };
 
+    const [downloadBlob, setDownloadBlob] = useState(null);
+
+    const handleDownload = async (report) => {
+        return new Promise((resolve, reject) => {
+            const blobProviderInstance = (
+                <BlobProvider document={<ActivityDownload report={report} />}>
+                    {({ blob, url, loading, error }) => {
+                        if (loading) return;
+                        if (error) {
+                            reject(error);
+                            return;
+                        }
+                        if (blob) {
+                            resolve(blob);
+                        }
+                    }}
+                </BlobProvider>
+            );
+
+            // Render BlobProvider to temporarily generate the blob
+            setDownloadBlob(blobProviderInstance);
+        })
+        .then((blob) => {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Activity_Report_${report.activityId}.pdf`;
+            link.click();
+            setDownloadBlob(null); // Cleanup
+        })
+        .catch((error) => {
+            console.error("Failed to generate PDF:", error);
+            setDownloadBlob(null); // Cleanup
+        });
+    };
+
     const handleDelete = async (activityId) => {
         // console.log("Deleting report with ID:", activityId);
         try {
@@ -85,6 +123,8 @@ const AdminDmsActivities = () => {
             } else {
                 console.error("Filtered reports is not an array:", filteredReports);
             }
+
+            handleReload();
         } catch (error) {
             toast.error("Failed to delete the report");
         }
@@ -103,11 +143,11 @@ const AdminDmsActivities = () => {
 
 
   return (
-        <div className='w-full min-h-[calc(100vh-61px)]'>
+        <div className='w-full min-h-[calc(100vh-99px)]'>
             <Modal isVisible={showModal}>
                 <ActivityView onClose={() => setShowModal(false)} reports={selectedReport}/>
             </Modal>
-            <div className='w-full h-40 flex justify-around items-center'>
+            <div className='w-full h-28 flex justify-around items-center'>
                 <div className='font-semibold text-3xl'>
                     Activities
                 </div>
@@ -165,6 +205,8 @@ const AdminDmsActivities = () => {
                                 <div className='w-[20%]'>{report.facultyName}</div>
                                 <div className='w-[20%] flex gap-2'>
                                     <button onClick={() => handleView(report)} className='text-blue-500'><FaEye /></button>
+                                    <div style={{ display: 'none' }}>{downloadBlob}</div>
+                                <button onClick={() => handleDownload(report)} className='text-gray-500'><IoMdDownload /></button>
                                     <button onClick={() => handleDelete(report.activityId)} className='text-pink-500'><MdDelete /></button>
                                 </div>
                             </div>

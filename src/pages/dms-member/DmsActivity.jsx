@@ -94,7 +94,7 @@ const DmsActivity = () => {
         <Modal isVisible={showModal}>
             <ActivityView onClose={() => setShowModal(false)} reports={selectedReport}/>
         </Modal>
-        <div className='w-full h-40 flex justify-around items-center'>
+        <div className='w-full h-28 flex justify-around items-center'>
             <div className='font-semibold text-3xl'>
                 Activities
             </div>

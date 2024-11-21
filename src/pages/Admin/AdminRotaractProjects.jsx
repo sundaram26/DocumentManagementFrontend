@@ -3,6 +3,7 @@ import { FaPlus, FaEye } from "react-icons/fa6";
 import { RxReload } from "react-icons/rx";
 import { MdDelete } from 'react-icons/md';
 import { IoBookmarkOutline } from "react-icons/io5";
+import { IoMdDownload } from "react-icons/io";
 import { IoChevronForward, IoChevronBack } from "react-icons/io5";
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +11,8 @@ import { deleteProject, fetchProjectReportsByUser } from '../../store/rotaractMe
 import Modal from '../../components/common/Modal';
 import { toast } from 'react-toastify';
 import ProjectView from '../rotaract-member/ProjectView.jsx';
+import { BlobProvider, PDFDownloadLink } from '@react-pdf/renderer';
+import ProjectDownload from '../rotaract-member/projectDownload.jsx';
 
 
 const PAGE_SIZE = 5;
@@ -73,6 +76,41 @@ const AdminRotaractProjects = () => {
         setSelectedReport(report);
         setShowModal(true);
     };
+    
+    const [downloadBlob, setDownloadBlob] = useState(null);
+
+    const handleDownload = async (report) => {
+        return new Promise((resolve, reject) => {
+            const blobProviderInstance = (
+                <BlobProvider document={<ProjectDownload report={report} />}>
+                    {({ blob, url, loading, error }) => {
+                        if (loading) return;
+                        if (error) {
+                            reject(error);
+                            return;
+                        }
+                        if (blob) {
+                            resolve(blob);
+                        }
+                    }}
+                </BlobProvider>
+            );
+
+            // Render BlobProvider to temporarily generate the blob
+            setDownloadBlob(blobProviderInstance);
+        })
+        .then((blob) => {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Project_Report_${report.projectId}.pdf`;
+            link.click();
+            setDownloadBlob(null); // Cleanup
+        })
+        .catch((error) => {
+            console.error("Failed to generate PDF:", error);
+            setDownloadBlob(null); // Cleanup
+        });
+    };
 
     const handleDelete = async (projectId) => {
         // console.log("Deleting report with ID:", projectId);
@@ -85,6 +123,8 @@ const AdminRotaractProjects = () => {
             } else {
                 console.error("Filtered reports is not an array:", filteredReports);
             }
+
+            handleReload()
         } catch (error) {
             toast.error("Failed to delete the report");
         }
@@ -103,11 +143,11 @@ const AdminRotaractProjects = () => {
 
 
   return (
-        <div className='w-full min-h-[calc(100vh-61px)]'>
+        <div className='w-full min-h-[calc(100vh-99px)]'>
             <Modal isVisible={showModal}>
                 <ProjectView onClose={() => setShowModal(false)} reports={selectedReport}/>
             </Modal>
-            <div className='w-full h-40 flex justify-around items-center'>
+            <div className='w-full h-28 flex justify-around items-center'>
                 <div className='font-semibold text-3xl'>
                     Projects
                 </div>
@@ -132,11 +172,11 @@ const AdminRotaractProjects = () => {
 
                 <div className='w-full text-md font-semibold flex justify-between items-center bg-gray-100 p-2 my-2 rounded-xl'>
                     <div className='w-[10%] uppercase'>Project ID</div>
-                    <div className='w-[10%] uppercase'>Name</div>
+                    <div className='w-[15%] uppercase'>Name</div>
                     <div className='w-[15%] uppercase'>Report Status</div>
-                    <div className='w-[20%] uppercase'>Avenue Main</div>
-                    <div className='w-[20%] uppercase'>Avenue Optional</div>
-                    <div className='w-[15%] uppercase'>Faculty Name</div>
+                    <div className='w-[25%] uppercase'>Avenue Main</div>
+                    <div className='w-[25%] uppercase'>Avenue Optional</div>
+                    {/* <div className='w-[15%] uppercase'>Faculty Name</div> */}
                     <div className='w-[10%] uppercase'>Actions</div>
                 </div>
                 
@@ -145,7 +185,7 @@ const AdminRotaractProjects = () => {
                         ? (filteredReports.map((report) => (
                             <div key={report.projectId} className='w-full text-md flex justify-between items-center p-2 my-1 rounded-xl'>
                                 <div className='w-[10%]'>{report.projectId}</div>
-                                <div className='w-[10%]'>{report.projectName}</div>
+                                <div className='w-[15%]'>{report.projectName}</div>
                                 <div className='w-[15%]'>
                                     {report.status === 'early' ? (
                                         <div className='h-8 w-fit px-2 py-0 text-lg capitalize flex justify-center items-center gap-2 border-2 rounded-full'>
@@ -164,11 +204,13 @@ const AdminRotaractProjects = () => {
                                         </div>
                                     ) : null}
                                 </div>
-                                <div className='w-[20%]'>{report.avenue1}</div>
-                                <div className='w-[20%]'>{report.avenue2}</div>
-                                <div className='w-[15%]'>{report.facultyName}</div>
+                                <div className='w-[25%]'>{report.avenue1}</div>
+                                <div className='w-[25%]'>{report.avenue2}</div>
+                                {/* <div className='w-[15%]'>{report.facultyName}</div> */}
                                 <div className='w-[10%] flex gap-2'>
                                     <button onClick={() => handleView(report)} className='text-blue-500'><FaEye /></button>
+                                    <div style={{ display: 'none' }}>{downloadBlob}</div>
+                                    <button onClick={() => handleDownload(report)} className='text-gray-500'><IoMdDownload /></button>
                                     <button onClick={() => handleDelete(report.projectId)} className='text-pink-500'><MdDelete /></button>
                                 </div>
                             </div>

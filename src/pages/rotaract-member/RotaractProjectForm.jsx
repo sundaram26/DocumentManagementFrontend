@@ -19,7 +19,7 @@ import { createProjectDraft, deleteProjectDraft, projectReport } from '../../sto
 
 const initialState = {
     projectName: '',
-    facultyName: '',
+    // facultyName: '',
     venue: '',
     projectMode: '',
     startDate: '',
@@ -30,11 +30,15 @@ const initialState = {
     isAnInstallation: false,
     isFlagship: false,
     isJointProject: false,
+    jointProjectPartner: '',
     income: 0,
     expense: 0,
     profit: 0,
     loss: 0,
     chairPersons: [],
+    activeHomeClubMembers: 0,
+    guestHomeClubMembers: 0,
+    districtCouncilMembers: 0,
     rotarians: 0,
     alumnus: 0,
     interactors: 0,
@@ -79,11 +83,14 @@ const chairPersonOptions = [
 
 const RotaractProjectForm = () => {
     const [formData, setFormData] = useState(initialState);
+    const [loading, setLoading] = useState(false);
     const [projectAim, setProjectAim] = useState("");
     const [projectGroundwork, setProjectGroundwork] = useState("");
+    const [projectSummary, setProjectSummary] = useState("");
     const [feedbackList, setFeedbackList] = useState([{ feedbackGivenBy: '', feedbackMessage: '' }]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [feedbackCount, setFeedbackCount] = useState(1);
+    const [financeExcelSheet, setFinanceExcelSheet] = useState(null);
     const [isDraft, setIsDraft] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -133,6 +140,27 @@ const RotaractProjectForm = () => {
         }
     };
 
+    const handleFinanceFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type and size
+            const validTypes = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+            const maxSize = 5 * 1024 * 1024; // 5 MB
+
+            if (!validTypes.includes(file.type)) {
+                toast.error('Please upload a valid Excel file (xls or xlsx).');
+                return;
+            }
+
+            if (file.size > maxSize) {
+                toast.error('File size exceeds the 5 MB limit.');
+                return;
+            }
+
+            setFinanceExcelSheet(file);
+        }
+    };
+
     const handleDraft = async (e) => {
         const checked = e.target.checked;
         setIsDraft(checked);
@@ -145,7 +173,7 @@ const RotaractProjectForm = () => {
         const formDataToSave = new FormData();
 
         Object.keys(formData).forEach(key => {
-            if (key !== 'projectAim' && key !== 'projectGroundwork') {
+            if (key !== 'projectAim' && key !== 'projectGroundwork' && key !== 'projectSummary') {
                 formDataToSave.append(key, formData[key]);
             }
         });
@@ -153,8 +181,14 @@ const RotaractProjectForm = () => {
         // Append projectAim, projectGroundwork, and feedbackList
         formDataToSave.append('projectAim', projectAim);
         formDataToSave.append('projectGroundwork', projectGroundwork);
+        formDataToSave.append('projectSummary', projectSummary);
         formDataToSave.append('feedbackList', JSON.stringify(feedbackList || []));
         formDataToSave.append('isDraft', checked); 
+        if (financeExcelSheet) {
+            formDataToSave.append('financeExcelSheet', financeExcelSheet);
+        }
+
+        // console.log("finance excel sheet: ", financeExcelSheet)
         // console.log("form data to save isDraft: ", checked)
         // if (checked) {
         //     formDataToSave.append('draftId', formData.draftId); // Include draftId if updating
@@ -203,13 +237,14 @@ const RotaractProjectForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true)
         
         if(isDraft){
             toast.message('You cannot submit the form while it is marked as a draft.')
             return 
         }
 
-        if (!projectAim.trim() || !projectGroundwork.trim()) {
+        if (!projectAim.trim() || !projectGroundwork.trim() || !projectSummary.trim()) {
             toast.error('Required data is not filled!');
             return;
         }
@@ -219,51 +254,59 @@ const RotaractProjectForm = () => {
         // Get word count for projectAim and projectGroundwork
         const projectAimWordCount = getWordCount(projectAim);
         const projectGroundworkWordCount = getWordCount(projectGroundwork);
+        const projectSummaryWordCount = getWordCount(projectSummary);
 
-        if (projectAimWordCount > 250) {
-            toast.error('Project Aim exceeds the 250-word limit. Please shorten your text.');
+        if (projectAimWordCount > 500) {
+            toast.error('Project Aim exceeds the 500-word limit. Please shorten your text.');
             return;
         }
 
-        if (projectGroundworkWordCount > 250) {
-            toast.error('Project Groundwork exceeds the 250-word limit. Please shorten your text.');
+        if (projectGroundworkWordCount > 1000) {
+            toast.error('Project Groundwork exceeds the 1000-word limit. Please shorten your text.');
             return;
         }
-        // console.log("avenue 2: ", formData.avenue2)
+        
+        if (projectSummaryWordCount > 1000) {
+            toast.error('Project Summary exceeds the 1000-word limit. Please shorten your text.');
+            return;
+        }
+
         if (formData.avenue1 === '' || formData.chairPersons === '') {
             toast.error('Please select valid options from dropdown!!!');
             return;
         }
-    
-        // console.log("project aim: ", projectAim)
-        // console.log("project groundwork: ", projectGroundwork)
+
+        if (formData.isJointProject){
+            if(formData.jointProjectPartner === ''){
+                toast.error("Project Partner is required!!!")
+            }
+        }
     
         try {
             const formDataToSubmit = new FormData();
         
             // Append non-file fields
             Object.keys(formData).forEach(key => {
-                if (key !== 'projectAim' && key !== 'projectGroundwork') {
-                formDataToSubmit.append(key, formData[key]);
+                if (key !== 'projectAim' && key !== 'projectGroundwork' && key !== 'projectSummary') {
+                    formDataToSubmit.append(key, formData[key]);
                 }
             });
         
             // Append projectAim, projectGroundwork, and feedbackList
             formDataToSubmit.append('projectAim', projectAim);
             formDataToSubmit.append('projectGroundwork', projectGroundwork);
+            formDataToSubmit.append('projectSummary', projectSummary)
             formDataToSubmit.append('feedbackList', JSON.stringify(feedbackList));
             formDataToSubmit.append('isDraft', isDraft)
-            //   formDataToSubmit.append('feedbackList', feedbackList);
+
+            // console.log("financeExcelSheet: ", financeExcelSheet)
+            if (financeExcelSheet) {
+                formDataToSubmit.append('financeExcelSheet', financeExcelSheet);
+            }
             
-            //   console.log("FormData to submit:");
-            //   for (let [key, value] of formDataToSubmit.entries()) {
-            //     console.log(`${key}: ${value}`);
-            //   }
 
             const actionResult = await dispatch(projectReport(formDataToSubmit));
             const response = actionResult.payload;
-
-            // console.log("response: ", response)
         
             if (response?.success) {
                 navigate('/member/rotaract-member/projects');
@@ -275,8 +318,9 @@ const RotaractProjectForm = () => {
                 toast.error(response?.message || "Submission failed!");
             }
         } catch (error) {
-            // console.error("error: ",error)
             toast.error("An error occurred during submission.");
+        } finally {
+            setLoading(false)
         }
     };
   
@@ -288,6 +332,7 @@ const RotaractProjectForm = () => {
         endDate: prevState.endDate || now,
         }));
     }, []);
+    
 
     useEffect(() => {
         const profitValue = formData.income - formData.expense;
@@ -299,12 +344,12 @@ const RotaractProjectForm = () => {
     }, [formData.income, formData.expense]);
 
     useEffect(() => {
-        const totalMembers = Number(formData.rotarians) + Number(formData.alumnus) + Number(formData.interactors) + Number(formData.otherGuests) + Number(formData.otherClubMembers) + Number(formData.otherPis) + Number(formData.otherDistrictRotaractors)
+        const totalMembers = Number(formData.activeHomeClubMembers) + Number(formData.guestHomeClubMembers) + Number(formData.districtCouncilMembers) + Number(formData.rotarians) + Number(formData.alumnus) + Number(formData.interactors) + Number(formData.otherGuests) + Number(formData.otherClubMembers) + Number(formData.otherPis) + Number(formData.otherDistrictRotaractors)
         setFormData((prevState) => ({
         ...prevState,
         totalMembers
         }))
-    }, [formData.rotarians, formData.alumnus, formData.interactors, formData.otherGuests, formData.otherClubMembers, formData.otherPis, formData.otherDistrictRotaractors])
+    }, [formData.activeHomeClubMembers, formData.guestHomeClubMembers, formData.districtCouncilMembers, formData.rotarians, formData.alumnus, formData.interactors, formData.otherGuests, formData.otherClubMembers, formData.otherPis, formData.otherDistrictRotaractors])
   
     const handleAimChange = (value) => {
         setProjectAim(value);
@@ -312,8 +357,12 @@ const RotaractProjectForm = () => {
     
     const handleGroundworkChange = (value) => {
         setProjectGroundwork(value);
-
     };
+
+    const handleSummaryChange = (value) => {
+        setProjectSummary(value);
+    }
+
 
     // console.log("draft data: ", draftData)
 
@@ -322,8 +371,6 @@ const RotaractProjectForm = () => {
         const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
         return localDate.toISOString().slice(0, 16); // This will return "yyyy-MM-ddTHH:mm"
     };
-
-
 
     useEffect(() => {
         // Assuming draftData is the fetched draft object
@@ -336,14 +383,18 @@ const RotaractProjectForm = () => {
                 startDate: formatDateForInput(draftData.startDate), // Format for input
                 endDate: formatDateForInput(draftData.endDate),
                 avenue1: draftData.avenue1,
-                avenue2: draftData.avenue2,
+                avenue2: draftData.avenue2 || '',
                 isFlagship: draftData.isFlagship,
                 isJointProject: draftData.isJointProject,
+                jointProjectPartner: draftData.jointProjectPartner,
                 isAnInstallation: draftData.isAnInstallation,
                 income: draftData.income || 0,
                 expense: draftData.expense || 0,
                 profit: draftData.profit || 0,
                 loss: draftData.loss || 0,
+                activeHomeClubMembers: draftData.activeHomeClubMembers || 0,
+                guestHomeClubMembers: draftData.guestHomeClubMembers || 0,
+                districtCouncilMembers: draftData.districtCouncilMembers || 0,
                 rotarians: draftData.rotarians || 0,
                 alumnus: draftData.alumnus || 0,
                 interactors: draftData.interactors || 0,
@@ -359,7 +410,10 @@ const RotaractProjectForm = () => {
             });
             setProjectAim(draftData.projectAim);
             setProjectGroundwork(draftData.projectGroundwork);
+            setProjectSummary(draftData.projectSummary)
             setFeedbackList(draftData.feedbackList || []);
+            // console.log("finance file: ", draftData.financeExcelSheet);
+            // setFinanceExcelSheet(draftData.financeExcelSheet)
         }
     }, [draftData]);
 
@@ -369,9 +423,9 @@ const RotaractProjectForm = () => {
         <p className='font-bold mb-4 text-xl'>New Project Report</p>
         
         {/* Faculty, Venue, project mode,  Name */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            {['Project Name', 'Faculty Name', 'Venue'].map((placeholder, index) => {
-                const name = ['projectName', 'facultyName', 'venue']
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            {['Project Name', 'Venue'].map((placeholder, index) => {
+                const name = ['projectName', 'venue']
                 return (
                     <div key={index} className="relative">
                         <label className="block text-gray-700">
@@ -390,12 +444,13 @@ const RotaractProjectForm = () => {
                 )
             })}
             <div className="relative">
-            <label className="block">Project Mode<span className="text-red-500">*</span></label>
-            <select name={'projectMode'} required defaultValue="select" onChange={handleChange} className='w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors'>
-                <option value="select" disabled>Project Mode</option>
-                <option value="online">ONLINE</option>
-                <option value="on-ground">ON-GROUND</option>
-            </select>
+                <label className="block">Project Mode<span className="text-red-500">*</span></label>
+                <select name={'projectMode'} required defaultValue="select" onChange={handleChange} className='w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors'>
+                    <option value="select" disabled>Project Mode</option>
+                    <option value="online">ONLINE</option>
+                    <option value="on-ground">ON-GROUND</option>
+                    <option value="both">BOTH</option>
+                </select>
             </div>
         </div>
 
@@ -439,11 +494,11 @@ const RotaractProjectForm = () => {
                             <option value="Career Developement">Career Developement</option>
                             <option value="International Service">International Service</option>
                             <option value="Sports">Sports</option>
-                            <option value="Digital Communication">Digital Communication</option>
-                            <option value="Partner In Service">Partner In Service</option>
+                            <option value="Digital Communications">Digital Communications</option>
+                            <option value="Partners In Service">Partners In Service</option>
                             <option value="Training, Revival And Sustenance">Training, Revival And Sustenance</option>
                             <option value="Editorial">Editorial</option>
-                            <option value="Public Relations">Public Relations</option>
+                            <option value="Public Relations And Marketing">Public Relations And Markeing</option>
                         </select>
                     </div>
                 )
@@ -465,11 +520,11 @@ const RotaractProjectForm = () => {
                             <option value="Career Developement">Career Developement</option>
                             <option value="International Service">International Service</option>
                             <option value="Sports">Sports</option>
-                            <option value="Digital Communication">Digital Communication</option>
-                            <option value="Partner In Service">Partner In Service</option>
+                            <option value="Digital Communications">Digital Communications</option>
+                            <option value="Partners In Service">Partners In Service</option>
                             <option value="Sports">Training, Revival And Sustenance</option>
                             <option value="Editorial">Editorial</option>
-                            <option value="Public Relations">Public Relations</option>
+                            <option value="Public Relations And Marketing">Public Relations And Marketing</option>
                         </select>
                     </div>
                 )
@@ -502,6 +557,23 @@ const RotaractProjectForm = () => {
                 )
             })}
         </div>
+        {formData.isJointProject && (
+            <div className="mt-4">
+                <label>Project Partner:<span className="text-red-500">*</span></label>
+                <input 
+                    type="text" 
+                    name="jointProjectPartner" 
+                    value={formData.jointProjectPartner || ''} 
+                    onChange={(e) => 
+                        setFormData((prev) => ({
+                            ...prev,
+                            jointProjectPartner: e.target.value,
+                        }))
+                    } 
+                    className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+                />
+            </div>
+        )}
       
         {/** Project Aim */}
         <div className="quill-container space-y-4 mb-6 mt-8">
@@ -518,17 +590,12 @@ const RotaractProjectForm = () => {
             required
             className="custom-quill border rounded-lg shadow-md"
             />
-            <p className='text-gray-400 text-sm right-0 text-end'>{`${projectAim.trim().split(/\s+/).filter(word => word.length > 0).length}/250 words`}</p>
+            <p className='text-gray-400 text-sm right-0 text-end'>{`${projectAim.trim().split(/\s+/).filter(word => word.length > 0).length}/500 words`}</p>
         </div>
 
         {/** Project Groundwork */}
         <div className="quill-container space-y-4 mb-6 mt-8">
             <p className="text-2xl font-semibold">Project Groundwork<span className="text-red-500">*</span></p>
-            {/* <RichTextEditor name={'meetingSummary'} content={content} setContent={setContent} /> */}
-            {/* <Editor
-            editorState={content}
-            onEditorStateChange={setContent}
-            /> */}
             <ReactQuill 
             value={projectGroundwork} 
             onChange={handleGroundworkChange} 
@@ -536,7 +603,20 @@ const RotaractProjectForm = () => {
             required
             className="custom-quill border rounded-lg shadow-md"
             />
-            <p className='text-gray-400 text-sm right-0 text-end'>{`${projectGroundwork.trim().split(/\s+/).filter(word => word.length > 0).length}/250 words`}</p>
+            <p className='text-gray-400 text-sm right-0 text-end'>{`${projectGroundwork.trim().split(/\s+/).filter(word => word.length > 0).length}/1000 words`}</p>
+        </div>
+
+        {/**Project Summary */}
+        <div className="quill-container space-y-4 mb-6 mt-8">
+            <p className="text-2xl font-semibold">Project Summary<span className="text-red-500">*</span></p>
+            <ReactQuill 
+            value={projectSummary} 
+            onChange={handleSummaryChange} 
+            modules={modules}
+            required
+            className="custom-quill border rounded-lg shadow-md"
+            />
+            <p className='text-gray-400 text-sm right-0 text-end'>{`${projectSummary.trim().split(/\s+/).filter(word => word.length > 0).length}/1000 words`}</p>
         </div>
 
         {/** Project Feedback */}
@@ -616,6 +696,19 @@ const RotaractProjectForm = () => {
             </div>
         </div>
 
+        <div className="space-y-4 mb-6">
+            <p className="font-semibold text-2xl">Project Finance Excelsheet (Maximum file size: 5MB)</p>
+            <div className='w-[50%]'>
+                <input 
+                    type="file" 
+                    name="financeExcelSheet" 
+                    value={formData.financeExcelSheet}
+                    onChange={handleFinanceFileChange}
+                />
+            </div>
+        </div>
+
+
         {/** Project Chair Person(s) */}      
         <div className="grid grid-cols-1 mb-6">
             <p className="font-semibold text-2xl mb-6">Project Chair Person(s)</p>
@@ -644,8 +737,29 @@ const RotaractProjectForm = () => {
         {/* Members Information */}
         <div className="space-y-4 mb-6">
             <p className="font-semibold text-2xl">
-            Members Information
+                Members Information
             </p>
+            <div className='w-full'>
+            {['Active Home Club Members', 'Guest Home Club Members', 'District Council Members'].map((label, index) => {
+                const name = ['activeHomeClubMembers', 'guestHomeClubMembers', 'districtCouncilMembers']
+                return (
+                    <div key={index} className="relative">
+                        <label className="block text-gray-700 mt-4">{label}<span className="text-red-500">*</span></label>
+                        <input
+                            type="number"
+                            name={name[index]}
+                            value={formData[name[index]] || ''}
+                            onChange={handleChange}
+                            required
+                            placeholder="0"
+                            min="0" 
+                            step="1"
+                            className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+                        />
+                    </div>
+                )
+            })}
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {['Rotarians', 'Alumnus', 'Interactors', 'Other Guests', 'Other Club Members', 'Other PIS', 'Other District Rotaractors', 'Total'].map((label, index) =>{
                 const name = ['rotarians', 'alumnus', 'interactors', 'otherGuests', 'otherClubMembers', 'otherPis', 'otherDistrictRotaractors', 'totalMembers']
@@ -685,49 +799,60 @@ const RotaractProjectForm = () => {
         </div>
 
         {/* Support Documents */}
-        <div className="space-y-4 mb-6">
-            <p className="font-semibold text-2xl">Support Documents</p>
+        <div className="w-full flex">
+            <div className="space-y-4 mb-6 w-[50%]">
+                <p className="font-semibold text-2xl">Support Documents</p>
 
-            {/* Cover Image URL Input */}
-            <div className="relative">
-                <label className="block text-gray-700">Cover Image URL<span className="text-red-500">*</span></label>
-                <input
-                    type="text"
-                    name="coverImageUrl"
-                    placeholder="Enter image URL"
-                    required
-                    value={formData.coverImageUrl}
-                    onChange={(e) => handleChange(e, 'coverImageUrl')}
-                    className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-                />
+                {/* Cover Image URL Input */}
+                <div className="relative">
+                    <label className="block text-gray-700">Cover Image URL<span className="text-red-500">*</span></label>
+                    <input
+                        type="text"
+                        name="coverImageUrl"
+                        placeholder="Enter image URL"
+                        required
+                        value={formData.coverImageUrl}
+                        onChange={(e) => handleChange(e, 'coverImageUrl')}
+                        className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+                    />
+                </div>
+
+                {/* Attendance Image URL Input */}
+                <div className="relative">
+                    <label className="block text-gray-700">Attendance Image URL<span className="text-red-500">*</span></label>
+                    <input
+                        type="text"
+                        name="attendanceImageUrl"
+                        placeholder="Enter image URL"
+                        required
+                        value={formData.attendanceImageUrl}
+                        onChange={(e) => handleChange(e, 'attendanceImageUrl')}
+                        className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+                    />
+                </div>
+
+                {/* Support Document URL Input */}
+                <div className="relative">
+                    <label className="block text-gray-700">Support Document URL (Image or Document)<span className="text-red-500">*</span></label>
+                    <input
+                        type="text"
+                        name="supportDocumentUrl"
+                        placeholder="Enter document URL"
+                        required
+                        onChange={(e) => handleChange(e, 'supportDocumentUrl')}
+                        value={formData.supportDocumentUrl}
+                        className="w-full border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
+                    />          
+                </div>
             </div>
-
-            {/* Attendance Image URL Input */}
-            <div className="relative">
-                <label className="block text-gray-700">Attendance Image URL<span className="text-red-500">*</span></label>
-                <input
-                    type="text"
-                    name="attendanceImageUrl"
-                    placeholder="Enter image URL"
-                    required
-                    value={formData.attendanceImageUrl}
-                    onChange={(e) => handleChange(e, 'attendanceImageUrl')}
-                    className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-                />
-            </div>
-
-            {/* Support Document URL Input */}
-            <div className="relative">
-                <label className="block text-gray-700">Support Document URL (Image or Document)<span className="text-red-500">*</span></label>
-                <input
-                    type="text"
-                    name="supportDocumentUrl"
-                    placeholder="Enter document URL"
-                    required
-                    onChange={(e) => handleChange(e, 'supportDocumentUrl')}
-                    value={formData.supportDocumentUrl}
-                    className="w-[50%] border-b border-gray-300 bg-transparent py-2 px-1 focus:outline-none focus:border-green-500 transition-colors"
-                />          
+            <div className="w-[50%] flex justify-center items-center">
+                {formData.coverImageUrl && (
+                    <img
+                        src={formData.coverImageUrl}
+                        alt="Cover Image"
+                        className="max-w-full max-h-80 object-cover rounded-lg"
+                    />
+                )}
             </div>
         </div>
 
@@ -742,10 +867,39 @@ const RotaractProjectForm = () => {
                 </button>
             </Link>
             <button
-            type="submit"
-            className="px-4 py-2 bg-white text-green-500 border-2 border-green-500 rounded-lg hover:bg-green-500 hover:text-white"
+                type="submit"
+                disabled={loading}
+                className={`bg-green-500 text-white py-2 px-4 rounded ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
             >
-                Submit
+            {loading ? (
+                <div className="flex items-center justify-center">
+                <svg
+                    className="animate-spin h-5 w-5 mr-3 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    ></circle>
+                    <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C6.48 0 2 4.48 2 10s4.48 10 10 10v-4a8 8 0 01-8-8z"
+                    ></path>
+                </svg>
+                Loading...
+                </div>
+            ) : (
+                "Submit"
+            )}
             </button>
         </div>
     </form>
