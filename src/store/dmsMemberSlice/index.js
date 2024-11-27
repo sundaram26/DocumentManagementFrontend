@@ -19,7 +19,7 @@ export const createMeetingReport = createAsyncThunk(
     async (formData) => {
         // console.log("create meeting report: ", formData)
         const response = await axios.post(
-            `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/meeting-reports`,
+            `https://documentmanagement-k686.onrender.com/api/v1/members/dms/meeting-reports`,
             formData,
             { withCredentials: true }
         );
@@ -32,7 +32,7 @@ export const getDmsMeetingByUser = createAsyncThunk(
     'dmsReports/getDmsMeetingByUser',
     async ({userId, page = 1, limit = 10, searchQuery }) => {
         const response = await axios.get(
-            `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/meeting-reports`,
+            `https://documentmanagement-k686.onrender.com/api/v1/members/dms/meeting-reports`,
             { 
               params: { userId, page, limit, searchQuery },
               withCredentials: true 
@@ -48,7 +48,7 @@ export const deleteDmsMeeting = createAsyncThunk(
   async (meetingId, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/meeting-reports/${meetingId}`,
+        `https://documentmanagement-k686.onrender.com/api/v1/members/dms/meeting-reports/${meetingId}`,
         { withCredentials: true }
       );
       // console.log("delete response: ",response.data);
@@ -64,7 +64,7 @@ export const createDmsMeetingDraft = createAsyncThunk(
     async (formData , { rejectWithValue }) => {
       try {
         const response = await axios.post(
-          `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/draft-meeting`,
+          `https://documentmanagement-k686.onrender.com/api/v1/members/dms/draft-meeting`,
           formData,
           { withCredentials: true }
         );
@@ -80,7 +80,7 @@ export const getDmsMeetingDrafts = createAsyncThunk(
     async (userId , { rejectWithValue }) => {
       try {
         const response = await axios.get(
-          `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/draft-meeting`,
+          `https://documentmanagement-k686.onrender.com/api/v1/members/dms/draft-meeting`,
           {
             params:{userId}, 
             withCredentials: true 
@@ -98,7 +98,7 @@ export const deleteDmsMeetingDraft = createAsyncThunk(
     async (draftId, { rejectWithValue }) => {
       try {
         const response = await axios.delete(
-          `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/draft-meeting/${draftId}`,
+          `https://documentmanagement-k686.onrender.com/api/v1/members/dms/draft-meeting/${draftId}`,
           { withCredentials: true }
         );
         return response.data;
@@ -116,7 +116,7 @@ export const activityReport = createAsyncThunk(
     async (formData, { rejectWithValue }) => {
         try {
             const response = await axios.post(
-            `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/activity-reports`,
+            `https://documentmanagement-k686.onrender.com/api/v1/members/dms/activity-reports`,
             formData,
             { withCredentials: true }
             );
@@ -131,7 +131,7 @@ export const fetchActivityReportsByUser = createAsyncThunk(
     'activityReports/fetchActivityReportsByUser',
     async ({userId, page = 1, limit = 10, searchQuery }) => {
         const response = await axios.get(
-            `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/activity-reports`,
+            `https://documentmanagement-k686.onrender.com/api/v1/members/dms/activity-reports`,
             { 
               params: { userId, page, limit, searchQuery },
               withCredentials: true 
@@ -147,7 +147,7 @@ export const deleteActivity = createAsyncThunk(
   async (activityId, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/activity-reports/${activityId}`,
+        `https://documentmanagement-k686.onrender.com/api/v1/members/dms/activity-reports/${activityId}`,
         { withCredentials: true }
       );
       return response.data;
@@ -162,7 +162,7 @@ export const createActivityDraft = createAsyncThunk(
     async (formData , { rejectWithValue }) => {
       try {
         const response = await axios.post(
-          `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/draft-activity`,
+          `https://documentmanagement-k686.onrender.com/api/v1/members/dms/draft-activity`,
           formData,
           { withCredentials: true }
         );
@@ -178,7 +178,7 @@ export const getActivityDrafts = createAsyncThunk(
     async (userId , { rejectWithValue }) => {
       try {
         const response = await axios.get(
-          `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/draft-activity`,
+          `https://documentmanagement-k686.onrender.com/api/v1/members/dms/draft-activity`,
           {
             params:{userId}, 
             withCredentials: true 
@@ -196,7 +196,7 @@ export const deleteActivityDraft = createAsyncThunk(
     async (draftId, { rejectWithValue }) => {
       try {
         const response = await axios.delete(
-          `https://documentmanagement-8vku.onrender.com/api/v1/members/dms/draft-activity/${draftId}`,
+          `https://documentmanagement-k686.onrender.com/api/v1/members/dms/draft-activity/${draftId}`,
           { withCredentials: true }
         );
         return response.data;
