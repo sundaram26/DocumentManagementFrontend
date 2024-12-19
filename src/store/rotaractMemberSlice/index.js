@@ -24,7 +24,7 @@ export const createMeetingReport = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/meeting-reports`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/meeting-reports`,
         formData,
         { withCredentials: true }
       );
@@ -39,7 +39,7 @@ export const getRotaractMeetingByUser = createAsyncThunk(
   'projectReports/getRotaractMeetingByUser',
   async ({userId, page = 1, limit = 10, searchQuery }) => {
       const response = await axios.get(
-          `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/meeting-reports`,
+          `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/meeting-reports`,
           { 
             params: { userId, page, limit, searchQuery },
             withCredentials: true 
@@ -55,7 +55,7 @@ export const deleteRotaractMeeting = createAsyncThunk(
   async (meetingId, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/meeting-reports/${meetingId}`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/meeting-reports/${meetingId}`,
         { withCredentials: true }
       );
       // console.log("delete response: ",response.data);
@@ -72,7 +72,7 @@ export const createRotaractMeetingDraft = createAsyncThunk(
   async (formData , { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/draft-meeting`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/draft-meeting`,
         formData,
         { withCredentials: true }
       );
@@ -88,7 +88,7 @@ export const getRotaractMeetingDrafts = createAsyncThunk(
   async (userId , { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/draft-meeting`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/draft-meeting`,
         {
           params:{userId}, 
           withCredentials: true 
@@ -106,7 +106,7 @@ export const deleteRotaractMeetingDraft = createAsyncThunk(
   async (draftId, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/draft-meeting/${draftId}`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/draft-meeting/${draftId}`,
         { withCredentials: true }
       );
       return response.data;
@@ -122,7 +122,7 @@ export const projectReport = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/project-reports`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/project-reports`,
         formData,
         { withCredentials: true }
       );
@@ -137,7 +137,7 @@ export const fetchProjectReportsByUser = createAsyncThunk(
   'projectReports/fetchProjectReportsByUser',
   async ({userId, page = 1, limit = 10, searchQuery }) => {
       const response = await axios.get(
-          `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/project-reports`,
+          `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/project-reports`,
           { 
             params: { userId, page, limit, searchQuery },
             withCredentials: true 
@@ -154,7 +154,7 @@ export const deleteProject = createAsyncThunk(
     // console.log("from index.js: ", projectId)
     try {
       const response = await axios.delete(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/project-reports/${projectId}`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/project-reports/${projectId}`,
         { withCredentials: true }
       );
       return response.data;
@@ -170,7 +170,7 @@ export const createProjectDraft = createAsyncThunk(
   async (formData , { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/draft-project`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/draft-project`,
         formData,
         { withCredentials: true }
       );
@@ -186,7 +186,7 @@ export const getProjectDrafts = createAsyncThunk(
   async (userId , { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/draft-project`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/draft-project`,
         {
           params:{userId}, 
           withCredentials: true 
@@ -204,7 +204,7 @@ export const deleteProjectDraft = createAsyncThunk(
   async (draftId, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/draft-project/${draftId}`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/draft-project/${draftId}`,
         { withCredentials: true }
       );
       return response.data;
@@ -221,7 +221,7 @@ export const createMouReport = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/mou-reports`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/mou-reports`,
         formData,
         { withCredentials: true }
       );
@@ -236,7 +236,7 @@ export const getRotaractMouByUser = createAsyncThunk(
   'mouReports/getRotaractMouByUser',
   async ({userId, page = 1, limit = 10, searchQuery }) => {
       const response = await axios.get(
-          `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/mou-reports`,
+          `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/mou-reports`,
           { 
             params: { userId, page, limit, searchQuery },
             withCredentials: true 
@@ -252,7 +252,7 @@ export const deleteRotaractMou = createAsyncThunk(
   async (mouId, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `https://documentmanagement-k686.onrender.com/api/v1/members/rotaract/mou-reports/${mouId}`,
+        `https://document-management-o9x0.onrender.com/api/v1/members/rotaract/mou-reports/${mouId}`,
         { withCredentials: true }
       );
       // console.log("delete response: ",response.data);
