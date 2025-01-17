@@ -35,7 +35,7 @@ export const registerUser = createAsyncThunk(
     '/auth/register',
     async (formData) => {
         const response = await axios.post(
-            `https://document-management-o9x0.onrender.com/api/v1/users/register`, 
+            `https://documentmanagement-wkjg.onrender.com/api/v1/users/register`, 
             formData, 
             { withCredentials: true }
         );
@@ -47,7 +47,7 @@ export const verifyEmail = createAsyncThunk(
     'auth/verify-email',
     async (verificationCode) => {
         const response = await axios.post(
-            `https://document-management-o9x0.onrender.com/api/v1/users/verify-otp`,
+            `https://documentmanagement-wkjg.onrender.com/api/v1/users/verify-otp`,
             { verificationCode },
             { withCredentials: true }
         );
@@ -59,7 +59,7 @@ export const resendVerificationEmail = createAsyncThunk(
     'auth/resend-verification-email',
     async () => {
         const response = await axios.post(
-            `https://document-management-o9x0.onrender.com/api/v1/users/resend-otp`,
+            `https://documentmanagement-wkjg.onrender.com/api/v1/users/resend-otp`,
             {},
             { withCredentials: true }
         );
@@ -72,7 +72,7 @@ export const loginUser = createAsyncThunk(
     async (formData) => {
         // console.log("form data: ", formData)
         const response = await axios.post(
-            `https://document-management-o9x0.onrender.com/api/v1/users/login`,
+            `https://documentmanagement-wkjg.onrender.com/api/v1/users/login`,
             formData,
             { withCredentials: true }
         );
@@ -86,7 +86,7 @@ export const forgotPassword = createAsyncThunk(
     async (email, { rejectWithValue }) => {
         try {
             const response = await axios.post(
-                `https://document-management-o9x0.onrender.com/api/v1/users/forgot-password`,
+                `https://documentmanagement-wkjg.onrender.com/api/v1/users/forgot-password`,
                 { email },
                 {withCredentials:true}
             );
@@ -102,7 +102,7 @@ export const resetPassword = createAsyncThunk(
     async ({ token, password }, { rejectWithValue }) => {
         try {
             const response = await axios.post(
-                `https://document-management-o9x0.onrender.com/api/v1/users/reset-password/${token}`, // Use the token in the URL
+                `https://documentmanagement-wkjg.onrender.com/api/v1/users/reset-password/${token}`, // Use the token in the URL
                 { password },
                 { withCredentials: true }
             );
@@ -117,7 +117,7 @@ export const checkAuth = createAsyncThunk(
     "/auth/checkAuth",
     async () => {
         const response = await axios.get(
-            `https://document-management-o9x0.onrender.com/api/v1/users/check-auth`,
+            `https://documentmanagement-wkjg.onrender.com/api/v1/users/check-auth`,
             {
                 withCredentials: true,
                 headers: {
@@ -134,7 +134,7 @@ export const logoutUser = createAsyncThunk(
     "/auth/logout",
     async () => {
         const response = await axios.post(
-            `https://document-management-o9x0.onrender.com/api/v1/users/logout`,
+            `https://documentmanagement-wkjg.onrender.com/api/v1/users/logout`,
             {},
             { withCredentials: true }
         )

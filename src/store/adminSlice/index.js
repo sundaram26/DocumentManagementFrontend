@@ -18,7 +18,7 @@ export const fetchUnapprovedUsers = createAsyncThunk(
     'admin/fetchUnapprovedUsers',
     async () => {
         const response = await axios.get(
-            `https://document-management-o9x0.onrender.com/api/v1/admin/requests`, 
+            `https://documentmanagement-wkjg.onrender.com/api/v1/admin/requests`, 
             { withCredentials: true }
         );
         return response.data; // Adjust according to your response structure
@@ -31,7 +31,7 @@ export const approveUser = createAsyncThunk(
     async (userId, { rejectWithValue }) => {
         try {
             const response = await axios.patch(
-                `https://document-management-o9x0.onrender.com/api/v1/admin/approve-user/${userId}`,
+                `https://documentmanagement-wkjg.onrender.com/api/v1/admin/approve-user/${userId}`,
                 {},
                 { withCredentials: true }
             );
@@ -47,7 +47,7 @@ export const disApproveUser = createAsyncThunk(
     async (userId, {rejectWithValue}) => {
         try{
             const response = await axios.post(
-                `https://document-management-o9x0.onrender.com/api/v1/admin/disapprove-user/${userId}`,
+                `https://documentmanagement-wkjg.onrender.com/api/v1/admin/disapprove-user/${userId}`,
                 {},
                 { withCredentials: true }
             );
@@ -61,7 +61,7 @@ export const disApproveUser = createAsyncThunk(
 export const fetchUsers = createAsyncThunk(
     'admin/fetchUsers',
     async () => {
-    const response = await axios.get(`https://document-management-o9x0.onrender.com/api/v1/admin/get-users`);
+    const response = await axios.get(`https://documentmanagement-wkjg.onrender.com/api/v1/admin/get-users`);
     // console.log("user response: ", response.data.data)
     return response.data.data;
 });
@@ -70,7 +70,7 @@ export const fetchReportsByUser = createAsyncThunk(
     'admin/fetchReportsByUser',
     async (userId, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`https://document-management-o9x0.onrender.com/api/v1/reports/user-reports/${userId}`, {
+            const response = await axios.get(`https://documentmanagement-wkjg.onrender.com/api/v1/reports/user-reports/${userId}`, {
                 withCredentials: true
             });
             return response.data.data; // Adjust according to your response structure
