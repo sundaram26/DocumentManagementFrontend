@@ -12,7 +12,7 @@ const AuthLogin = () => {
   const navigate = useNavigate()
 
   const [loading, setLoading] = useState(false);
-
+  const [loginLoading, setLoginLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -54,6 +54,7 @@ const AuthLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoginLoading(true);
 
     // Frontend validations
     if (!email) {
@@ -75,6 +76,7 @@ const AuthLogin = () => {
         const actionResult = await dispatch(loginUser(formData));
         const { data, success } = actionResult?.payload || {};
         // console.log("actionResult: ", actionResult);
+        // setLoading(true)
         
 
         // Backend response handling
@@ -94,6 +96,7 @@ const AuthLogin = () => {
             }
 
             if (success) {
+                setLoginLoading(false);
                 toast.success("Login Successful");
                 switch (user?.role) {
                     case 'admin':
@@ -181,14 +184,29 @@ const AuthLogin = () => {
               type="submit"
               className="w-full p-3 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-geen-500 mr-2"
             >
-              Login
+              {loginLoading ? (
+                <span className='flex items-center'>
+                  <FaSpinner className='animate-spin mr-2' /> 
+                  Please wait...
+                </span>
+              ) : (
+                "Login"
+              )}
             </button>
             <Link to='/auth/register' className='w-full'>
               <button
                 type="button"
                 className="w-full p-3 text-white bg-gray-500 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
-                Register
+                
+                {loginLoading ? (
+                  <span className='flex items-center justify-center'>
+                    <FaSpinner className='animate-spin mr-2' /> 
+                    Please wait...
+                  </span>
+                ) : (
+                  "Login"
+                )}
               </button>
             </Link>
           </div>

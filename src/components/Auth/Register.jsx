@@ -16,6 +16,7 @@ const initialState = {
 
 const AuthRegister = () => {
   const [formData, setFormData] = useState(initialState);
+  const [loading, setLoading] = useState(false)
 
   // console.log(formData)
   const { firstName, lastName, role, email, password, confirmPassword } = formData;
@@ -38,6 +39,7 @@ const AuthRegister = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!validateEmail(email)) {
       toast.info("Invalid email format!", {
@@ -91,6 +93,7 @@ const AuthRegister = () => {
       // console.log("response: ",response)
 
       if (response?.success) {
+        setLoading(false);
         // console.log("Navigating to verification page")
         navigate('/auth/verify-email');
       } else {
@@ -171,7 +174,14 @@ const AuthRegister = () => {
               type="submit"
               className="w-full p-3 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-geen-500 mr-2"
             >
-              Register
+              {loading ? (
+                <span className='flex items-center justify-center'>
+                  <FaSpinner className='animate-spin mr-2' /> 
+                  Please wait...
+                </span>
+              ) : (
+                "Register"
+              )}
             </button>
 
             <Link to='/auth/login' className='w-full'>
