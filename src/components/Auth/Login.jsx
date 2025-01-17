@@ -199,14 +199,7 @@ const AuthLogin = () => {
                 className="w-full p-3 text-white bg-gray-500 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
                 
-                {loginLoading ? (
-                  <span className='flex items-center justify-center'>
-                    <FaSpinner className='animate-spin mr-2' /> 
-                    Please wait...
-                  </span>
-                ) : (
-                  "Login"
-                )}
+                Register
               </button>
             </Link>
           </div>
