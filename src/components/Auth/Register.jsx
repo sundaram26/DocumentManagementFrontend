@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 import { registerUser } from '../../store/authSlice';
+import { FaSpinner } from 'react-icons/fa';
 
 const initialState = {
   firstName: "",
