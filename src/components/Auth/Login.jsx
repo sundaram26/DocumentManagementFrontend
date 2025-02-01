@@ -58,16 +58,19 @@ const AuthLogin = () => {
 
     // Frontend validations
     if (!email) {
-        toast.error("Email is required");
-        return;
+      toast.error("Email is required");
+      setLoginLoading(false)  
+      return;
     } else if (!emailRegex.test(email)) {
-        toast.error("Please enter a valid email address");
-        return;
+      toast.error("Please enter a valid email address");
+      setLoading(false);
+      return;
     }
 
     if (!password) {
-        toast.error("Password is required");
-        return;
+      toast.error("Password is required");
+      setLoading(false);
+      return;
     }
 
     try {
@@ -84,15 +87,17 @@ const AuthLogin = () => {
             const { response, user } = data;
 
             if (!response.isVerified) {
-                toast.error("Email is not verified");
-                toast.success("Redirecting to email verification page");
-                navigate("/auth/verify-email");
-                return;
+              toast.error("Email is not verified");
+              toast.success("Redirecting to email verification page");
+              navigate("/auth/verify-email");
+              setLoading(false)
+              return;
             }
 
             if (!response.isApproved) {
-                toast.error("You can log in once the admin accepts your request.");
-                return;
+              toast.error("You can log in once the admin accepts your request.");
+              setLoginLoading(false)
+              return;
             }
 
             if (success) {
@@ -100,17 +105,17 @@ const AuthLogin = () => {
                 toast.success("Login Successful");
                 switch (user?.role) {
                     case 'admin':
-                        navigate("/admin");
-                        break;
+                      navigate("/admin");
+                      break;
                     case 'DMS':
-                        navigate("/member/dms-member");
-                        break;
+                      navigate("/member/dms-member");
+                      break;
                     case 'Rotaract':
-                        navigate("/member/rotaract-member");
-                        break;
+                      navigate("/member/rotaract-member");
+                      break;
                     default:
-                        toast.error("Unexpected user role");
-                        break;
+                      toast.error("Unexpected user role");
+                      break;
                 }
                 return;
             } else {

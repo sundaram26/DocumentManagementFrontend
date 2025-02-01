@@ -46,11 +46,13 @@ const AuthRegister = () => {
       toast.info("Invalid email format!", {
         position: toast.position.top_right
       });
+      setLoading(false)
       return;
     }
 
     if (role === "select") {
       toast.error("Please select a valid role.");
+      setLoading(false);
       return;
     }    
 
@@ -77,13 +79,14 @@ const AuthRegister = () => {
           progress: undefined,
         }
       );
-      
+      setLoading(false);
       return;
     }
 
     // Check if passwords match
     if (password !== confirmPassword) {
       toast.error("Passwords do not match!");
+      setLoading(false);
       return;
     }
 
