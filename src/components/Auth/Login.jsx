@@ -114,23 +114,28 @@ const AuthLogin = () => {
                 }
                 return;
             } else {
-                toast.error("Login failed!");
+              toast.error("Login failed!");
+              setLoginLoading(false)
             }
         } else if(actionResult.error.name === "AxiosError"){
             if(actionResult.error.message === "Request failed with status code 401"){
               toast.error("Email or Password is incorrect!!");
+              setLoginLoading(false)
               return;
             } else if(actionResult.error.message === "Request failed with status code 404"){
               toast.error("Your email is not registered!!");
               navigate("/auth/register")
+              setLoginLoading(false)
               return;
             }
         } else {
           toast.error("Unexpected response format");
+          setLoginLoading(false)
         }
     } catch (error) {
       console.error("Error: ", error);
       toast.error("Some unexpected error occurred!!!")
+      setLoginLoading(false)
     }
   
   };
@@ -197,8 +202,7 @@ const AuthLogin = () => {
               <button
                 type="button"
                 className="w-full p-3 text-white bg-gray-500 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              >
-                
+              >               
                 Register
               </button>
             </Link>

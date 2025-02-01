@@ -98,9 +98,11 @@ const AuthRegister = () => {
         navigate('/auth/verify-email');
       } else {
         toast.error(response?.message || "Registration failed!");
+        setLoading(false)
       }
     } catch (error) {
       toast.error("An error occurred during registration.");
+      setLoading(false)
     }
   };
 
